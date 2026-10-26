@@ -7,6 +7,7 @@ import { S, crime, me, disguised, policeHere } from '../game/state.js';
 import { modes, riskLevel } from '../game/risk.js';
 import { lotValue, offerFor, robberyRisk, LOAN } from '../game/money.js';
 import { drawOverlay } from './map.js';
+import { patoBubble } from './pato.js';
 
 const btn = (act, arg, label, { cls = 'ghost', disabled = false } = {}) =>
   `<button class="btn ${cls}" type="button" data-act="${act}"${arg != null ? ` data-arg="${esc(arg)}"` : ''}${disabled ? ' disabled' : ''}>${label}</button>`;
@@ -41,7 +42,7 @@ export function render() {
   const body = S.tab === 'act' ? renderAct(c) : S.tab === 'via' ? renderVia(c) : renderNews();
   if (S.tab === 'news') S.unread = 0;
   const tabs = [['act', 'Acciones'], ['via', 'Viajar'], ['news', 'Noticias', S.unread]];
-  $('#panel').innerHTML = `<div class="cityhead"><div class="eyebrow">${esc(cr.n)} · ${esc(COUNTRIES[c.c].n)}</div><h2>${esc(c.n)}</h2><div class="tags">${tags.join('')}</div></div>
+  $('#panel').innerHTML = `<div class="cityhead"><div class="eyebrow">${esc(cr.n)} · ${esc(COUNTRIES[c.c].n)}</div><h2>${esc(c.n)}</h2><div class="tags">${tags.join('')}</div>${patoBubble()}</div>
   <div class="tabs" role="tablist">${tabs.map(([k, n, u]) => `<button role="tab" type="button" aria-selected="${S.tab === k}" data-act="tab" data-arg="${k}">${n}${u && S.tab !== k ? `<span class="n">${u}</span>` : ''}</button>`).join('')}</div>
   <div class="tabbody">${body}</div>`;
   drawOverlay();

@@ -56,9 +56,18 @@ src/
     render.js         Barra de estado y pestañas
     screens.js        Elegir golpe, informe y resultado
     events.js         Manejador único de clics (data-act / data-arg)
+  assets/pato/        Ilustración y 8 expresiones del pato (WebP, fondo limpio)
+  ui/pato.js          Estado de ánimo del pato y sus frases
+  ui/fx.js            Animación de huida al viajar
 public/
+  favicon.png         Ícono del juego
   rastro-austral.html Prototipo anterior en modo detective
+art/original/         Paquete de arte original del personaje (referencia, no se publica)
 ```
+
+## Personaje
+
+El pato reacciona a lo que pasa en la fuga: se burla en una casa segura, se asusta con una noticia nueva o con la PDI cerca, se enoja con el calor alto, guiña disfrazado, ríe si escapas y queda triste si lo atrapan. Las imágenes del juego son recortes limpios del paquete original en `art/original/`, con el fondo quitado y convertidos a WebP.
 
 ## Mapa
 

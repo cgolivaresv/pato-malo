@@ -6,13 +6,15 @@
   <title>Pato Malo</title>
   <meta name="description" content="Juego de escape: eres el prófugo y huyes de la PDI e Interpol por Chile, Sudamérica y el mundo.">
   <meta name="theme-color" content="#16131a">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;800&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
 </head>
 <body>
   <header class="top">
-    <div class="brand"><i aria-hidden="true"></i>Pato Malo</div>
+    <div class="brand"><img id="brandFace" alt="" width="36" height="36"><span>Pato Malo</span><i aria-hidden="true"></i></div>
     <div class="stats" id="stats"></div>
   </header>
 
@@ -20,7 +22,7 @@
     <div class="mapwrap">
       <svg id="map" role="img" aria-label="Mapa de la fuga"></svg>
       <div class="legend">
-        <span><b style="background:#ff9a3c"></b>Tú</span>
+        <span><b style="background:#ff9a3c"></b>Pato Malo</span>
         <span><b style="background:#ff5d5d"></b>Rastro conocido</span>
         <span><b style="background:#7bd88f"></b>Casa segura</span>
         <span><b style="background:#4aa8ff"></b>Policía (con soplón)</span>
@@ -35,6 +37,7 @@
 
   <div class="overlay" id="ov" hidden></div>
   <div class="toast" id="toast" hidden></div>
+  <div class="fx" id="fx" hidden></div>
 
   <script type="module" src="/src/main.js"></script>
 </body>

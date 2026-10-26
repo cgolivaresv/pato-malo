@@ -8,6 +8,7 @@ import { finish } from '../game/engine.js';
 import { render, toast } from './render.js';
 import { showCrimes, startGame, closeOv, begin } from './screens.js';
 import { zoomMe, zoomWorld } from './map.js';
+import { playTravel } from './fx.js';
 
 let surrenderArmed = false;
 
@@ -37,7 +38,7 @@ const ACTIONS = {
   borrow: () => borrow(),
   repay: () => repay(),
   // Viajar: arg = "ciudad|medio"
-  travel: (arg) => { const [to, k] = arg.split('|'); travel(to, k); },
+  travel: async (arg) => { const [to, k] = arg.split('|'); await playTravel(to, k); travel(to, k); },
   surrender: () => {
     if (!surrenderArmed) {
       surrenderArmed = true;

@@ -6,6 +6,7 @@ import { S, setS, newGame, crime, me } from '../game/state.js';
 import { news } from '../game/engine.js';
 import { render } from './render.js';
 import { zoomMe } from './map.js';
+import { PATO, face, quip } from './pato.js';
 
 const ov = () => $('#ov');
 const modal = (label, inner) => `<div class="modal" role="dialog" aria-label="${label}"><div class="bar"></div><div class="in">${inner}</div></div>`;
@@ -16,8 +17,8 @@ export function showCrimes() {
   const car = store('fuga-career') || { escapes: 0, played: 0, points: 0 };
   ov().hidden = false;
   ov().innerHTML = modal('Elegir golpe', `
-  <div class="small mono">FUGAS EXITOSAS ${car.escapes}/${car.played} · ${car.points.toLocaleString('es-CL')} PTS</div>
-  <h1>Pato Malo</h1>
+  <div class="hero"><div class="hero-txt"><div class="small mono">FUGAS EXITOSAS ${car.escapes}/${car.played} · ${car.points.toLocaleString('es-CL')} PTS</div>
+  <h1>Pato Malo</h1><p class="hero-quip">«Nadie atrapa a un pato con estilo.»</p></div><img class="hero-pato" src="${PATO}" alt="Pato Malo con gorra, lentes oscuros y chaqueta de cuero" width="328" height="457"></div>
   <p>Acabas de dar el golpe en una ciudad de Chile. Ahora la PDI te busca. Cada cosa que haces puede dejar un rastro que la policía descubre horas después, y la brigada viaja hacia el último lugar donde supo de ti.</p>
   <ul class="rules">
     <li>No ves a la policía. Te enteras de lo que saben por las noticias, o pagando a un soplón.</li>
@@ -40,6 +41,7 @@ export function startGame(id) {
   ov().innerHTML = modal('El golpe', `
   <div class="small mono">${clock(0).toUpperCase()} · ${esc(c.n.toUpperCase())}</div>
   <h1>${esc(cr.n)}</h1>
+  <div class="pato-bubble"><img class="pato-face" src="${face('burlo')}" alt="" width="56" height="56"><p>«${esc(quip('burlo'))}»</p></div>
   <p>Saliste de ${esc(c.n)} con <b>${esc(cr.loot)}</b> y ${money(cr.cash)} en efectivo. La alarma suena en ${cr.alarm} horas.</p>
   <p>${esc(cr.d)}</p>
   <div class="score"><span>Casas seguras</span><span>${S.safe.map((i) => esc(CITY[i].n)).join(', ')}</span>${S.buyer ? `<span>Comprador</span><span>${esc(CITY[S.buyer].n)}</span>` : ''}<span>Interpol</span><span>en ${cr.interpol} h</span></div>
@@ -52,7 +54,7 @@ export function showEnd() {
   ov().hidden = false;
   ov().innerHTML = modal('Resultado', `
   <div class="small mono">${clock(S.hours).toUpperCase()} · ${Math.round(S.hours)} H DE FUGA</div>
-  <h1>${o.win ? 'Desapareciste' : 'Detenido'}</h1><p>${esc(o.msg)}</p>
+  <div class="end-head"><img class="end-face" src="${face(o.win ? 'rie' : 'triste')}" alt="" width="96" height="96"><div><h1>${o.win ? 'Desapareciste' : 'Detenido'}</h1><p class="hero-quip">«${esc(quip(o.win ? 'rie' : 'triste'))}»</p></div></div><p>${esc(o.msg)}</p>
   <div class="score"><span>Recorrido</span><span>${S.path.map((i) => esc(CITY[i].n)).join(' → ')}</span><span>Rastros descubiertos</span><span>${S.traces.filter((t) => t.shown).length}</span><span>Efectivo final</span><span>${money(Math.max(0, S.cash))}</span>${o.win ? `<span><b>Puntaje</b></span><span><b>${o.pts.toLocaleString('es-CL')}</b></span>` : ''}</div>
   <div class="act"><button class="btn" type="button" data-act="crimes">Otro golpe</button><button class="btn ghost" type="button" data-act="viewMap">Ver el mapa</button></div>`);
 }

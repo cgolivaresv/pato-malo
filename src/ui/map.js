@@ -3,6 +3,7 @@ import MAP from '../data/map.json';
 import { CITIES, CITY, inSA } from '../data/geo.js';
 import { $, esc } from '../lib/util.js';
 import { S, me } from '../game/state.js';
+import { face, moodOf } from './pato.js';
 
 const C = { sea: '#100e14', me: '#ff9a3c', meInk: '#1d1105', ink: '#f1ebe4', dot: '#b9adb9', trace: '#ff5d5d', safe: '#7bd88f', police: '#4aa8ff' };
 
@@ -20,7 +21,9 @@ export function initMap() {
   for (let la = -60; la <= 75; la += 15) { const y = P({ la, lo: 0 })[1]; g += `<line class="grat" x1="0" y1="${y}" x2="${MAP.W}" y2="${y}"/>`; }
   g += '</g>';
   for (const k of ['o', 'sa', 'lim', 'cl']) g += `<path class="${k}" d="${MAP.g[k]}"/>`;
-  svg.innerHTML = g + '<g id="ovl"></g>';
+  // Recorte circular para la cara del pato en el mapa
+  const defs = '<defs><clipPath id="meclip" clipPathUnits="objectBoundingBox"><circle cx=".5" cy=".5" r=".5"/></clipPath></defs>';
+  svg.innerHTML = defs + g + '<g id="ovl"></g>';
   let rz;
   addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(drawOverlay, 150); });
 }
@@ -62,8 +65,12 @@ export function drawOverlay() {
       h += `<circle cx="${x}" cy="${y}" r="${6 * k}" fill="${C.police}" stroke="${C.sea}" stroke-width="${1.5 * k}" pointer-events="none"/>` + lbl(x, y - 12 * k, 'PDI', C.police, 10.5);
       if (po.arrive != null && po.target) h += `<path d="${arc(CITY[po.city], CITY[po.target])}" fill="none" stroke="${C.police}" stroke-width="${1.6 * k}" stroke-dasharray="${3 * k} ${3 * k}" pointer-events="none"/>`;
     }
-    const [x, y] = P(me());
-    h += `<circle class="pulse" cx="${x}" cy="${y}" r="${6 * k}" fill="${C.me}" pointer-events="none"/><circle cx="${x}" cy="${y}" r="${6 * k}" fill="${C.me}" stroke="${C.meInk}" stroke-width="${1.5 * k}" pointer-events="none"/>` + lbl(x, y - 10 * k, me().n, C.me, 13);
+    // Pato Malo: la cara cambia con su estado de ánimo
+    const [x, y] = P(me()), r = 13 * k;
+    h += `<circle class="pulse" cx="${x}" cy="${y}" r="${7 * k}" fill="${C.me}" pointer-events="none"/>`
+      + `<circle cx="${x}" cy="${y}" r="${r + 2 * k}" fill="#201b26" stroke="${C.me}" stroke-width="${2 * k}" pointer-events="none"/>`
+      + `<image href="${face(moodOf())}" x="${x - r}" y="${y - r}" width="${2 * r}" height="${2 * r}" clip-path="url(#meclip)" preserveAspectRatio="xMidYMin slice" pointer-events="none"/>`
+      + lbl(x + 10 * k, y - 12 * k, me().n, C.me, 13);
   }
   o.innerHTML = h;
 }
