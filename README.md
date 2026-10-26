@@ -35,6 +35,8 @@ npm run build    # genera la versión publicable en dist/
 
 Cada vez que se sube un cambio a `main`, GitHub Actions compila el juego y lo publica en GitHub Pages.
 
+Para medir el balance, con `npm run dev` abre `/pato-malo/sim/` y ejecuta `runSim(120)` en la consola: juega fugas automáticas con varias estrategias y muestra cuánto gana cada una. El simulador no se publica.
+
 ## Estructura
 
 ```
