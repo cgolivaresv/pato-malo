@@ -53,7 +53,7 @@ export function showTitle(play) {
     <div class="ti-alarm">¡Alarma!</div>
     <div class="ti-beam"></div>
     <img class="ti-cop" src="${MCCUACK}" alt="" width="450" height="745">
-    <img class="ti-pato" src="${PATO}" alt="" width="328" height="457">
+    <img class="ti-pato" src="${PATO}" alt="" width="299" height="514">
   </div>
   <div class="ti-ui">
     <div class="ti-logo"><div class="ti-stamp">Pato Malo</div><p class="ti-tag">«Nadie atrapa a un pato con estilo.»</p></div>
@@ -63,7 +63,8 @@ export function showTitle(play) {
       <div class="ti-vs"><img src="${face('burlo')}" alt="" width="34" height="34"><span>vs</span><img src="${detFace('serio')}" alt="" width="34" height="34"><small>Detective Patrick McCuack · «La ley también tiene patas»</small></div>
     </div>
   </div>
-  <button type="button" class="ti-skip" data-act="titleSkip">Saltar intro</button>`;
+  <button type="button" class="ti-skip" data-act="titleSkip">Saltar intro</button>
+  <div class="ti-version">v${__APP_VERSION__} · ${__APP_BUILD__}</div>`;
   document.body.appendChild(el);
   live = true;
   initMap();

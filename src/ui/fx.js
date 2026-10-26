@@ -12,7 +12,7 @@ export function playTravel(toId, mode) {
   if (busy || reduced()) return Promise.resolve();
   busy = true;
   const fx = $('#fx');
-  fx.innerHTML = `<div class="fx-road" aria-hidden="true"></div><div class="fx-run fx-${mode}"><img src="${PATO}" alt="" width="164" height="228"></div><p>${VERB[mode] || 'Rumbo a'} <b>${esc(CITY[toId].n)}</b></p>`;
+  fx.innerHTML = `<div class="fx-road" aria-hidden="true"></div><div class="fx-run fx-${mode}"><img src="${PATO}" alt="" width="150" height="258"></div><p>${VERB[mode] || 'Rumbo a'} <b>${esc(CITY[toId].n)}</b></p>`;
   fx.hidden = false;
   return new Promise((done) => {
     setTimeout(() => { fx.hidden = true; fx.innerHTML = ''; busy = false; done(); }, 1100);

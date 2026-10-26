@@ -1,7 +1,7 @@
 {
   "name": "pato-malo",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.7.0",
   "description": "Juego de escape: eres el prófugo y huyes de la PDI e Interpol por Chile, Sudamérica y el mundo.",
   "type": "module",
   "scripts": {

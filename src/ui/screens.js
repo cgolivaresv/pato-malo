@@ -29,7 +29,7 @@ export function showCrimes() {
       <h1>Pato<br>Malo</h1>
       <p class="hero-quip">«Nadie atrapa a un pato con estilo.»</p>
     </div>
-    <img class="hero-pato" src="${PATO}" alt="Pato Malo con gorra, lentes oscuros y chaqueta de cuero" width="328" height="457">
+    <img class="hero-pato" src="${PATO}" alt="Pato Malo con gorra, lentes oscuros y chaqueta de cuero" width="299" height="514">
   </div>
   <p class="lead">Acabas de dar el golpe en Chile. Cada cosa que haces puede dejar un rastro que la policía descubre horas después, y la brigada viaja al último lugar donde supo de ti.</p>
   <div class="rival"><img src="${MCCUACK}" alt="${DET_NAME}, con sombrero fedora, lentes oscuros y gabardina" width="90" height="149"><div><div class="file-no">Te persigue</div><b>${DET_NAME}</b><p>Jefe de la Brigada de Robos. Nunca duerme y nunca olvida una pista.</p><p class="rival-motto">«${MOTTO}»</p></div></div>

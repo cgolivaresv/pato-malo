@@ -565,3 +565,5 @@ a { color: var(--sodium); }
 @media (max-width: 480px) { .ti-vs small { flex-basis: 100%; text-align: center; padding-bottom: 4px; } .ti-vs { border-radius: 16px; padding: 6px 10px; } }
 .ti-skip { position: absolute; right: var(--gutter-r); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); font-family: var(--f-label); font-weight: 600; font-size: 14px; color: var(--muted); padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: #0b0910aa; }
 .title.onmap .ti-skip { display: none; }
+.ti-version { position: absolute; left: 0; right: 0; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); text-align: center; font-family: var(--f-mono); font-size: 11px; color: #ffffff59; letter-spacing: .06em; pointer-events: none; }
+.ti-menu { margin-bottom: 10px; }
