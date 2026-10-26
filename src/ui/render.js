@@ -8,6 +8,7 @@ import { modes, riskLevel } from '../game/risk.js';
 import { lotValue, offerFor, robberyRisk, LOAN } from '../game/money.js';
 import { drawOverlay } from './map.js';
 import { patoBubble } from './pato.js';
+import { detBubble, detVisible, detFace } from './detective.js';
 
 const btn = (act, arg, label, { cls = 'ghost', disabled = false } = {}) =>
   `<button class="btn ${cls}" type="button" data-act="${act}"${arg != null ? ` data-arg="${esc(arg)}"` : ''}${disabled ? ' disabled' : ''}>${label}</button>`;
@@ -42,7 +43,7 @@ export function render() {
   const body = S.tab === 'act' ? renderAct(c) : S.tab === 'via' ? renderVia(c) : renderNews();
   if (S.tab === 'news') S.unread = 0;
   const tabs = [['act', 'Acciones'], ['via', 'Viajar'], ['news', 'Noticias', S.unread]];
-  $('#panel').innerHTML = `<div class="cityhead"><div class="eyebrow">${esc(cr.n)} · ${esc(COUNTRIES[c.c].n)}</div><h2>${esc(c.n)}</h2><div class="tags">${tags.join('')}</div>${patoBubble()}</div>
+  $('#panel').innerHTML = `<div class="cityhead"><div class="eyebrow">${esc(cr.n)} · ${esc(COUNTRIES[c.c].n)}</div><h2>${esc(c.n)}</h2><div class="tags">${tags.join('')}</div>${patoBubble()}${detVisible() ? detBubble() : ''}</div>
   <div class="tabs" role="tablist">${tabs.map(([k, n, u]) => `<button role="tab" type="button" aria-selected="${S.tab === k}" data-act="tab" data-arg="${k}">${n}${u && S.tab !== k ? `<span class="n">${u}</span>` : ''}</button>`).join('')}</div>
   <div class="tabbody">${body}</div>`;
   drawOverlay();
@@ -132,8 +133,10 @@ function renderVia(c) {
 }
 
 function renderNews() {
-  const list = [...S.news].reverse().map((n) => `<div><time>${clock(n.t)}</time><span class="${n.cls}">${esc(n.x)}</span></div>`).join('');
-  return `${objectives()}<div class="sec">Radio y prensa</div><div class="news">${list || '<p class="small">Sin noticias por ahora.</p>'}</div>
+  // Las noticias de la policía llevan la cara de McCuack
+  const who = (cls) => (cls === 'me' ? '' : `<img class="news-face" src="${detFace(cls === 'alert' ? 'burlon' : 'serio')}" alt="" width="20" height="20">`);
+  const list = [...S.news].reverse().map((n) => `<div><time>${clock(n.t)}</time><span class="${n.cls}">${who(n.cls)}${esc(n.x)}</span></div>`).join('');
+  return `${objectives()}${detVisible() ? '' : detBubble()}<div class="sec">Radio y prensa</div><div class="news">${list || '<p class="small">Sin noticias por ahora.</p>'}</div>
   <div class="act">${btn('surrender', null, 'Entregarse')}</div>`;
 }
 

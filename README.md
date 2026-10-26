@@ -57,17 +57,24 @@ src/
     screens.js        Elegir golpe, informe y resultado
     events.js         Manejador único de clics (data-act / data-arg)
   assets/pato/        Ilustración y 8 expresiones del pato (WebP, fondo limpio)
+  assets/detective/   Ilustración y 6 expresiones del detective McCuack
   ui/pato.js          Estado de ánimo del pato y sus frases
+  ui/detective.js     Estado de ánimo y frases del detective McCuack
   ui/fx.js            Animación de huida al viajar
 public/
   favicon.png         Ícono del juego
   rastro-austral.html Prototipo anterior en modo detective
-art/original/         Paquete de arte original del personaje (referencia, no se publica)
+art/original/         Arte original de Pato Malo (referencia, no se publica)
+art/detective-original/ Arte original del detective McCuack (referencia)
 ```
 
 ## Personaje
 
 El pato reacciona a lo que pasa en la fuga: se burla en una casa segura, se asusta con una noticia nueva o con la PDI cerca, se enoja con el calor alto, guiña disfrazado, ríe si escapas y queda triste si lo atrapan. Las imágenes del juego son recortes limpios del paquete original en `art/original/`, con el fondo quitado y convertidos a WebP.
+
+## El rival
+
+El **Detective Patrick McCuack**, jefe de la Brigada de Robos, encabeza la persecución. Aparece en el mapa cuando pagas al soplón, habla cuando descubre un rastro tuyo y comenta el final de cada fuga. Su lema: «La ley también tiene patas».
 
 ## Mapa
 

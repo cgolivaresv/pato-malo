@@ -130,3 +130,19 @@ img{max-width:100%}
 @keyframes dash{0%{transform:translateX(-70vw) rotate(-8deg)}25%{transform:translateX(-4vw) rotate(4deg)}40%{transform:translateX(0) rotate(-3deg) translateY(-6px)}70%{transform:translateX(4vw) rotate(2deg)}100%{transform:translateX(80vw) rotate(10deg)}}
 @keyframes fly{0%{transform:translate(-70vw,30px) rotate(-14deg)}35%{transform:translate(0,-8px) rotate(-6deg)}70%{transform:translate(6vw,-14px) rotate(-8deg)}100%{transform:translate(80vw,-60px) rotate(-18deg)}}
 @media (prefers-reduced-motion:reduce){.hero-pato,.fx-run,.pato-face{animation:none!important}}
+
+/* ---------- Detective Patrick McCuack ---------- */
+.det-bubble{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:10px}
+.det-face{width:56px;height:56px;flex:none;border-radius:50%;border:2px solid var(--siren);object-fit:cover;background:#0d1626}
+.det-bubble p{position:relative;margin:0;background:#16233a;border-radius:10px;padding:7px 11px;font-size:13.5px;line-height:1.35;text-align:left;max-width:calc(100% - 66px)}
+.det-bubble p b{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--siren);font-style:normal}
+.det-bubble p::after{content:"";position:absolute;right:-6px;top:50%;margin-top:-6px;border:6px solid transparent;border-right:0;border-left-color:#16233a}
+.det-bubble[data-mood="enfadado"] .det-face,.det-bubble[data-mood="burlon"] .det-face{border-color:var(--bad)}
+.news-face{width:20px;height:20px;border-radius:50%;vertical-align:-5px;margin-right:6px;object-fit:cover;border:1px solid var(--siren)}
+
+.rival{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-left:3px solid var(--siren);border-radius:8px;padding:10px 12px;background:#16233a66}
+.rival img{width:76px;height:auto;flex:none;filter:drop-shadow(0 6px 12px #000a)}
+.rival div{display:flex;flex-direction:column;gap:3px;min-width:0}
+.rival b{font-size:16px}
+.rival p{margin:0}
+.rival-motto{font-style:italic;color:var(--siren);font-size:13.5px}

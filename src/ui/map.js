@@ -4,6 +4,7 @@ import { CITIES, CITY, inSA } from '../data/geo.js';
 import { $, esc } from '../lib/util.js';
 import { S, me } from '../game/state.js';
 import { face, moodOf } from './pato.js';
+import { detFace } from './detective.js';
 
 const C = { sea: '#100e14', me: '#ff9a3c', meInk: '#1d1105', ink: '#f1ebe4', dot: '#b9adb9', trace: '#ff5d5d', safe: '#7bd88f', police: '#4aa8ff' };
 
@@ -62,7 +63,10 @@ export function drawOverlay() {
     const po = S.police;
     if (po.city && (S.hours < S.soplonUntil || S.over)) {
       const [x, y] = P(CITY[po.city]);
-      h += `<circle cx="${x}" cy="${y}" r="${6 * k}" fill="${C.police}" stroke="${C.sea}" stroke-width="${1.5 * k}" pointer-events="none"/>` + lbl(x, y - 12 * k, 'PDI', C.police, 10.5);
+      const pr = 11 * k;
+      h += `<circle cx="${x}" cy="${y}" r="${pr + 2 * k}" fill="#0d1626" stroke="${C.police}" stroke-width="${2 * k}" pointer-events="none"/>`
+        + `<image href="${detFace('serio')}" x="${x - pr}" y="${y - pr}" width="${2 * pr}" height="${2 * pr}" clip-path="url(#meclip)" preserveAspectRatio="xMidYMid slice" pointer-events="none"/>`
+        + lbl(x + 8 * k, y - 12 * k, 'McCuack', C.police, 10.5);
       if (po.arrive != null && po.target) h += `<path d="${arc(CITY[po.city], CITY[po.target])}" fill="none" stroke="${C.police}" stroke-width="${1.6 * k}" stroke-dasharray="${3 * k} ${3 * k}" pointer-events="none"/>`;
     }
     // Pato Malo: la cara cambia con su estado de ánimo
