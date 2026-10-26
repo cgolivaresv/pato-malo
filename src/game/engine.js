@@ -4,6 +4,7 @@ import { REWARDS } from '../data/content.js';
 import { R, pick, dist, money, store } from '../lib/util.js';
 import { S, crime, me, disguised, interpol, policeHere } from './state.js';
 import { offerFor } from './money.js';
+import { spreadHeat, decayAbroad, interpolHeat } from './heat.js';
 import { rest } from './actions.js';
 import { render, toast } from '../ui/render.js';
 import { showEnd } from '../ui/screens.js';
@@ -29,10 +30,11 @@ export function advance(h, ctx) {
     left -= step;
     S.hours += step;
     S.heat = Math.max(0, S.heat - step * (ctx.rest ? 0.7 : 0.25));
+    decayAbroad(step);
     for (const t of S.traces) {
       if (!t.shown && S.hours >= t.at) {
         t.shown = true;
-        S.heat = Math.min(100, S.heat + 14);
+        spreadHeat(CITY[t.city].c, 14);
         S.alert[CITY[t.city].c] = S.hours + 24;
         S.police.known = t.city;
         S.police.target = t.city;
@@ -41,7 +43,7 @@ export function advance(h, ctx) {
     }
     if (!S.interpolShown && interpol()) {
       S.interpolShown = true;
-      S.heat = Math.min(100, S.heat + 15);
+      interpolHeat();
       news(S.hours, 'Interpol emite una notificación roja con tu nombre. Los controles con tu documento real serán mucho más estrictos.', 'alert');
     }
     policeTick(step);

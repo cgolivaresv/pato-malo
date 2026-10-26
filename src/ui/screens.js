@@ -10,6 +10,7 @@ import { PATO, face, quip } from './pato.js';
 import { MCCUACK, DET_NAME, MOTTO, detBubble, detFace } from './detective.js';
 import { I } from './icons.js';
 import { endStamp } from './fx.js';
+import { maybeTutorial } from './tutorial.js';
 
 const ov = () => $('#ov');
 const modal = (label, inner, cls = '') => `<div class="modal ${cls}" role="dialog" aria-modal="true" aria-label="${label}"><div class="tape" aria-hidden="true"></div><div class="in">${inner}</div></div>`;
@@ -57,7 +58,7 @@ export function startGame(id) {
   <div class="pato-bubble"><img class="pato-face" src="${face('burlo')}" alt="" width="56" height="56"><p>${esc(quip('burlo'))}</p></div>
   <p class="lead">Saliste de ${esc(c.n)} con <b>${esc(cr.loot)}</b> y ${money(cr.cash)} en efectivo. La alarma suena en ${cr.alarm} ${cr.alarm === 1 ? 'hora' : 'horas'}.</p>
   <p>${esc(cr.d)}</p>
-  <dl class="facts"><dt>${I.house}Casas seguras</dt><dd>${S.safe.map((i) => esc(CITY[i].n)).join(', ')}</dd>${S.buyer ? `<dt>${I.pin}Comprador</dt><dd>${esc(CITY[S.buyer].n)}</dd>` : ''}<dt>${I.globe}Interpol</dt><dd>en ${cr.interpol} h</dd></dl>
+  <dl class="facts"><dt>${I.house}Casas seguras</dt><dd>${S.safe.map((i) => esc(CITY[i].n)).join(', ')}</dd>${S.buyer ? `<dt>${I.pin}Comprador</dt><dd>${esc(CITY[S.buyer].n)}</dd>` : ''}<dt>${I.globe}Interpol</dt><dd>en ${cr.interpol} h</dd><dt>${S.season === 'invierno' ? I.snow : I.sun}Estación</dt><dd>${S.season === 'invierno' ? 'Invierno: la nieve cierra los pasos a Argentina en el centro y sur' : 'Verano: los pasos cordilleranos están abiertos'}</dd></dl>
   <div class="det-bubble"><p><b>McCuack</b> Alerta a todas las unidades: un pato con gorra y lentes oscuros. La ley también tiene patas.</p><img class="det-face" src="${detFace('serio')}" alt="" width="56" height="56"></div>
   <div class="act-row"><button class="btn big" type="button" data-act="begin">Empezar la fuga</button></div>`, 'brief');
   render();
@@ -76,4 +77,4 @@ export function showEnd() {
   <div class="act-row"><button class="btn big" type="button" data-act="crimes">Otro golpe</button><button class="btn ghost" type="button" data-act="viewMap">Ver el recorrido</button></div>`, o.win ? 'end win' : 'end lose');
 }
 
-export function begin() { closeOv(); render(); zoomMe(); }
+export function begin() { closeOv(); render(); zoomMe(); setTimeout(maybeTutorial, 700); }

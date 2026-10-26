@@ -11,6 +11,7 @@ import { showCrimes, startGame, closeOv, begin } from './screens.js';
 import { zoomMe, zoomWorld } from './map.js';
 import { playTravel, hideStamp } from './fx.js';
 import { I } from './icons.js';
+import { startTutorial, tutNext, endTutorial } from './tutorial.js';
 
 let surrenderArmed = false;
 
@@ -24,6 +25,10 @@ const ACTIONS = {
   zoomMe: () => zoomMe(),
   zoomWorld: () => zoomWorld(),
   toggleStats: () => { ui.statsOpen = !ui.statsOpen; render(); },
+  // Tutorial
+  tutorial: () => { if (S && !S.over) startTutorial(); else showCrimes(); },
+  tutNext: () => tutNext(),
+  tutSkip: () => endTutorial(),
   // Hojas de acciones: tocar la abierta la cierra
   sheet: (id) => { S.tab = S.tab === id ? 'act' : id; render(); if (id === 'move') zoomMe(); },
   closeSheet: () => { S.tab = 'act'; render(); },

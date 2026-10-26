@@ -4,6 +4,7 @@ import { LOTS } from '../data/content.js';
 import { R, pick, money } from '../lib/util.js';
 import { S, crime, me, disguised, interpol, policeHere } from './state.js';
 import { modes } from './risk.js';
+import { enterCountry } from './heat.js';
 import { addTrace, news, pay, advance, after, caught, finish } from './engine.js';
 import { toast } from '../ui/render.js';
 
@@ -105,7 +106,7 @@ export function travel(toId, k) {
   if (S.over) return;
   const from = me(), to = CITY[toId];
   const mo = modes(S.cur, toId).out.find((o) => o.k === k);
-  if (!mo || S.cash < mo.m) return;
+  if (!mo || mo.closed || S.cash < mo.m) return;
   pay(mo.m);
   if (k === 'bus' && mo.free) S.perks.bus--;
   if (S.perks.press && (k === 'air' || mo.id)) S.perks.press--;
@@ -121,15 +122,20 @@ export function travel(toId, k) {
     if (realId) addTrace(toId, 1.5, `Migraciones confirma que volaste de ${from.n} a ${to.n} con tu ${S.idBurnSecret ? 'pasaporte falso ya identificado' : 'documento'}.`);
     else if (R() < 0.07) { S.idBurnSecret = true; addTrace(toId, 4, `La PDI descubre tu identidad falsa en el vuelo ${from.n} → ${to.n}.`); }
   } else if (k === 'bus') {
-    if (mo.id && realId) addTrace(toId, 4, `El control fronterizo registra tu paso en bus rumbo a ${to.n}.`);
+    if (mo.id && realId) addTrace(toId, 4, mo.trace || `El control fronterizo registra tu paso en bus rumbo a ${to.n}.`);
     else if (R() < 0.28) addTrace(toId, 9 + R() * 6, `Cámaras del terminal de ${to.n} te captan bajando de un bus.`);
+  } else if (k === 'barco') {
+    if (realId && R() < 0.3) addTrace(toId, 12, `La lista de pasajeros del barco a ${to.n} incluye tu nombre real.`);
   } else if (k === 'paso') {
     if (R() < 0.12) addTrace(toId, 20, `Pobladores cerca de ${to.n} reportan a un forastero que cruzó por un paso no habilitado.`);
   }
   news(S.hours, `${mo.n}: ${from.n} → ${to.n} (${money(mo.m)}).`, 'me');
-  advance(mo.h, { where: 'transit', rest: k === 'bus' && mo.h >= 6 });
+  const sleeps = (k === 'bus' || k === 'barco') && mo.h >= 6;
+  advance(mo.h, { where: 'transit', rest: sleeps });
   if (S.over) return;
-  S.awake = k === 'bus' && mo.h >= 6 ? 0 : S.awake + mo.h;
+  S.awake = sleeps ? 0 : S.awake + mo.h;
+  // Al cruzar la frontera llegas con el calor que tienes en ese país
+  enterCountry(from.c, to.c);
   S.cur = toId; S.path.push(toId); S.dest = ''; S.tab = 'act';
   if (policeHere() && R() < (disguised() ? 0.15 : 0.28)) { caught(`Al llegar a ${to.n} te topaste con la brigada que te esperaba.`); return; }
   if (S.job && S.job.to === toId) {

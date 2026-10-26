@@ -384,3 +384,36 @@ a { color: var(--sodium); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
+
+/* ---------- Calor por país y estación ---------- */
+.heat-mini { color: var(--muted); }
+.heat-mini.hot { color: var(--bad); }
+.heat-mini.cool { color: var(--ok); }
+.ch-head .heat-mini { display: flex; align-items: center; gap: 4px; font-size: 13px; margin-top: 2px; }
+.ch-head .heat-mini .ico { width: 14px; height: 14px; }
+.heat-table { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px 14px; margin: 2px 0 6px; }
+.ht { display: grid; grid-template-columns: 1fr 52px 24px; align-items: center; gap: 6px; font-size: 12.5px; }
+.ht b { font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ht.here b { color: var(--sodium); }
+.ht .bar { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; display: block; }
+.ht .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--sodium), var(--bad)); }
+.ht em { font-style: normal; font-family: var(--f-mono); color: var(--ink); text-align: right; }
+.st-more > span:last-child { display: block; }
+.tag.cold { border-color: #9cc9ff66; color: #b9dbff; }
+.mode.closed { background: #ffffff08; color: #6b6170; position: relative; }
+.mode.closed::after { content: ""; position: absolute; left: 4px; right: 4px; top: 50%; height: 2px; background: #6b6170; transform: rotate(-35deg); }
+
+/* ---------- Tutorial ---------- */
+.help { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); font-family: var(--f-display); font-weight: 900; font-size: 17px; color: var(--muted); display: grid; place-items: center; }
+.tut { position: fixed; inset: 0; z-index: 35; }
+.tut.center { background: #0a080cd9; }
+.tut-spot { position: fixed; border-radius: 14px; box-shadow: 0 0 0 9999px #0a080cd0, 0 0 0 3px var(--sodium); transition: all .3s cubic-bezier(.2, .8, .2, 1); pointer-events: none; }
+.tut-card { position: fixed; left: var(--gutter); right: var(--gutter-r); margin: 0 auto; max-width: 460px; display: flex; gap: 12px; align-items: flex-start; background: var(--paper) var(--noise); border: 1px solid var(--line); border-radius: 16px; padding: 14px; box-shadow: 0 18px 50px #000c; animation: slideUp .3s cubic-bezier(.2, .8, .2, 1); }
+.tut.center .tut-card { top: 50%; transform: translateY(-50%); animation: fade .3s; }
+.tut-card img { width: 64px; height: 64px; flex: none; border-radius: 50%; border: 2px solid var(--sodium); background: var(--paper-2); object-fit: cover; object-position: top; }
+.tut-txt { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.tut-step { font-family: var(--f-label); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+.tut-txt b { font-family: var(--f-display); font-weight: 900; font-size: 22px; text-transform: uppercase; letter-spacing: .02em; line-height: 1; }
+.tut-txt p { margin: 0; font-size: 14.5px; line-height: 1.4; }
+.tut-act { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(12px); } }

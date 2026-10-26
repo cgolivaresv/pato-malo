@@ -5,6 +5,7 @@ import { LOTS } from '../data/content.js';
 import { esc, money, clock, dist } from '../lib/util.js';
 import { S, crime, me } from '../game/state.js';
 import { modes, riskLevel } from '../game/risk.js';
+import { heatOf } from '../game/heat.js';
 import { lotValue, offerFor, robberyRisk, ROBBERY, LOAN } from '../game/money.js';
 import { I } from './icons.js';
 import { decision, chips, group } from './components.js';
@@ -75,6 +76,8 @@ const FILTERS = [
   ['cerca', 'Cercanos'], ['cl', 'Chile'], ['vecinos', 'Vecinos'], ['sa', 'Sudamérica'], ['mundo', 'Mundo'],
 ];
 
+const MODE_ICON = { air: 'plane', bus: 'bus', paso: 'boot', barco: 'ship' };
+
 export function destList() {
   const c = me();
   let list = CITIES.filter((x) => x.id !== c.id);
@@ -91,28 +94,33 @@ export function destList() {
   return list.map(({ x, d }) => {
     const m = modes(c.id, x.id);
     const icons = m.out.length
-      ? m.out.map((o) => `<span class="mode r${riskLevel(o.p)}" title="${o.n}">${I[o.k === 'air' ? 'plane' : o.k === 'bus' ? 'bus' : 'boot']}</span>`).join('')
+      ? m.out.map((o) => `<span class="mode ${o.closed ? 'closed' : 'r' + riskLevel(o.p)}" title="${o.n}${o.closed ? ': ' + o.closed : ''}">${I[MODE_ICON[o.k]]}</span>`).join('')
       : '<span class="mode none">Sin ruta directa</span>';
-    return `<button type="button" class="dest-row${S.dest === x.id ? ' sel' : ''}" data-act="dest" data-arg="${x.id}"><span class="dr-name"><b>${esc(x.n)}</b><small>${esc(COUNTRIES[x.c].n)} · ${Math.round(d).toLocaleString('es-CL')} km</small></span><span class="dr-modes">${icons}</span></button>`;
+    const h = x.c !== c.c ? Math.round(heatOf(x.c)) : null;
+    const heatTxt = h != null ? ` · <span class="heat-mini ${h >= 45 ? 'hot' : h < 15 ? 'cool' : ''}">calor ${h}</span>` : '';
+    return `<button type="button" class="dest-row${S.dest === x.id ? ' sel' : ''}" data-act="dest" data-arg="${x.id}"><span class="dr-name"><b>${esc(x.n)}</b><small>${esc(COUNTRIES[x.c].n)} · ${Math.round(d).toLocaleString('es-CL')} km${heatTxt}</small></span><span class="dr-modes">${icons}</span></button>`;
   }).join('');
 }
 
 function chosen() {
   if (!S.dest) return '';
   const c = me(), t = CITY[S.dest], { d, out, note } = modes(c.id, t.id);
-  const ICON = { air: I.plane, bus: I.bus, paso: I.boot };
+  const ICON = { air: I.plane, bus: I.bus, paso: I.boot, barco: I.ship };
   const DESC = {
     air: S.id === 'real' || S.idBurnSecret ? 'Pide documento: con el real, la PDI sabrá tu destino en minutos.' : 'Pide documento: viajas con el pasaporte falso.',
-    bus: (o) => (o.id ? 'Cruza frontera: muestras documento en el control.' : 'Dentro del país no piden documento, pero hay cámaras.') + (o.free ? ' Usas tu pasaje abierto.' : ''),
+    bus: (o) => (t.c !== c.c ? 'Cruza frontera: muestras documento en el control.' : o.id ? 'Viaje dentro del país, pero con control de documentos en la ruta.' : 'Dentro del país no piden documento, pero hay cámaras.') + (o.free ? ' Usas tu pasaje abierto.' : ''),
     paso: 'Evitas migraciones por la cordillera. Lento, caro y con patrullas.',
+    barco: 'No piden documento en el muelle, pero la lista de pasajeros queda registrada.',
   };
   const cards = out.map((o) => decision({
     act: 'travel', arg: `${t.id}|${o.k}`, primary: o.k === 'air', icon: ICON[o.k],
-    title: `${o.n} a ${esc(t.n)}`, desc: typeof DESC[o.k] === 'function' ? DESC[o.k](o) : DESC[o.k],
+    title: `${o.n} a ${esc(t.n)}`,
+    desc: [typeof DESC[o.k] === 'function' ? DESC[o.k](o) : DESC[o.k], ...(o.info || [])].map(esc).join(' '),
     chipsHtml: chips({ h: o.h, cost: o.m, p: o.p, riskText: `Control ${Math.round(o.p * 100)}%`, riskLvl: riskLevel(o.p) }),
-    disabled: broke(o.m), why: whyMoney(o.m),
+    disabled: !!o.closed || broke(o.m), why: o.closed || whyMoney(o.m),
   })).join('');
-  return `<div class="chosen"><div class="ch-head"><div><div class="c-eyebrow">Destino elegido · ${Math.round(d).toLocaleString('es-CL')} km</div><b>${esc(t.n)}, ${esc(COUNTRIES[t.c].n)}</b></div><button type="button" class="sh-close" data-act="dest" data-arg="" aria-label="Quitar destino">${I.close}</button></div>${note ? `<p class="hint">${esc(note)}</p>` : ''}<div class="g-list">${cards}</div></div>`;
+  const heatThere = t.c !== c.c ? `<span class="heat-mini ${heatOf(t.c) >= 45 ? 'hot' : heatOf(t.c) < 15 ? 'cool' : ''}">${I.flame}Calor en ${esc(COUNTRIES[t.c].n)}: ${Math.round(heatOf(t.c))} (aquí ${Math.round(S.heat)})</span>` : '';
+  return `<div class="chosen"><div class="ch-head"><div><div class="c-eyebrow">Destino elegido · ${Math.round(d).toLocaleString('es-CL')} km</div><b>${esc(t.n)}, ${esc(COUNTRIES[t.c].n)}</b>${heatThere}</div><button type="button" class="sh-close" data-act="dest" data-arg="" aria-label="Quitar destino">${I.close}</button></div>${note ? `<p class="hint">${esc(note)}</p>` : ''}<div class="g-list">${cards}</div></div>`;
 }
 
 function move() {
@@ -121,7 +129,7 @@ function move() {
   <div class="finder"><label class="search">${I.search}<input id="q" type="search" placeholder="Buscar ciudad o país" value="${esc(ui.q)}" autocomplete="off" aria-label="Buscar ciudad o país"></label>
   <div class="filters" role="group" aria-label="Filtrar destinos">${FILTERS.map(([k, n]) => `<button type="button" class="filter" data-act="filter" data-arg="${k}" aria-pressed="${!ui.q && ui.filter === k}">${n}</button>`).join('')}</div></div>
   <div class="dest-list" id="destList">${destList()}</div>
-  <p class="hint">La PDI te vio por última vez en <b>${S.police.known ? esc(CITY[S.police.known].n) : 'ningún lugar'}</b>. Los iconos muestran el riesgo de cada medio: verde bajo, naranjo medio, rojo alto.</p>`;
+  <p class="hint">La PDI te vio por última vez en <b>${S.police.known ? esc(CITY[S.police.known].n) : 'ningún lugar'}</b>. Los iconos muestran el riesgo de cada medio: verde bajo, naranjo medio, rojo alto, tachado cerrado. Cada país tiene su propio calor: donde nadie te conoce, los controles son más fáciles.</p>`;
 }
 
 // ---------- Plata ----------

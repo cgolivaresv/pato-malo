@@ -10,6 +10,7 @@ import { I } from './icons.js';
 import { shortMoney } from './components.js';
 import { SHEETS, SECTIONS, renderSheet } from './sheets.js';
 import { playStamp } from './fx.js';
+import { heatOf } from '../game/heat.js';
 
 // Estado solo de interfaz (no forma parte de la partida)
 export const ui = { statsOpen: false, q: '', filter: 'cerca', lastShown: 0, game: null };
@@ -57,10 +58,17 @@ function renderStats() {
   el.innerHTML = `
   <span class="st">${I.clock}<b>${clock(S.hours)}</b><small>Hora</small></span>
   <span class="st ${S.cash < 200000 ? 'bad' : ''}">${I.cash}<b>${shortMoney(S.cash)}</b><small>${ui.statsOpen ? money(S.cash) : 'Efectivo'}</small></span>
-  <span class="st heat ${lvl}">${I.flame}<b>${heat}</b><small>Calor</small><i class="bar"><i style="width:${heat}%"></i></i></span>
+  <span class="st heat ${lvl}">${I.flame}<b>${heat}</b><small>Calor en ${esc(COUNTRIES[me().c].n)}</small><i class="bar"><i style="width:${heat}%"></i></i></span>
   <span class="st ${S.id === 'fake' ? 'good' : ''}">${I.id}<b>${S.id === 'fake' ? 'Falso' : 'Real'}</b><small>Documento</small></span>
   <span class="st ${ip < 12 ? 'bad' : ''}">${I.globe}<b>${ip > 0 ? Math.ceil(ip) + ' h' : 'Activa'}</b><small>Interpol</small></span>
-  ${ui.statsOpen ? `<span class="st-more">Despierto ${Math.round(S.awake)} h de 20 · ${disguised() ? 'Disfrazado' : 'Sin disfraz'} · Última pista de la PDI: ${S.police.known ? esc(CITY[S.police.known].n) : 'ninguna'}</span>` : ''}`;
+  ${ui.statsOpen ? `<span class="st-more">${heatTable()}<span>${S.season === 'invierno' ? 'Invierno: pasos a Argentina cerrados en el centro y sur' : 'Verano: pasos cordilleranos abiertos'} · Despierto ${Math.round(S.awake)} h de 20 · ${disguised() ? 'Disfrazado' : 'Sin disfraz'} · Última pista de la PDI: ${S.police.known ? esc(CITY[S.police.known].n) : 'ninguna'}</span></span>` : ''}`;
+}
+
+// Calor de los países donde ya se habla de ti
+function heatTable() {
+  const cs = [me().c, ...Object.keys(S.heatBy)].filter((c, i, a) => a.indexOf(c) === i);
+  const rows = cs.map((c) => [c, Math.round(heatOf(c))]).filter(([, h]) => h >= 1).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  return `<span class="heat-table">${rows.map(([c, h]) => `<span class="ht ${c === me().c ? 'here' : ''}"><b>${esc(COUNTRIES[c].n)}</b><i class="bar"><i style="width:${h}%"></i></i><em>${h}</em></span>`).join('')}</span>`;
 }
 
 // El aviso más urgente, si lo hay
@@ -86,6 +94,7 @@ function renderStrip() {
   if (S.fenceKnown.includes(c.id)) tags.push(`<span class="tag amber">${I.coins}Reducidor</span>`);
   if (HUB.has(c.id)) tags.push(`<span class="tag">${I.plane}Vuelos internacionales</span>`);
   if (disguised()) tags.push(`<span class="tag">${I.mask}Disfrazado</span>`);
+  if (S.season === 'invierno' && ['CL', 'AR'].includes(c.c)) tags.push(`<span class="tag cold">${I.snow}Invierno</span>`);
   tags.push(`<a class="tag link" href="${gmaps(c)}" target="_blank" rel="noopener">${I.map}Maps</a><a class="tag link" href="${street(c)}" target="_blank" rel="noopener">${I.eye}Street View</a>`);
   $('#strip').innerHTML = `<div class="city"><div class="c-eyebrow">${esc(cr.n)} · ${esc(COUNTRIES[c.c].n)}</div><h2>${esc(c.n)}</h2><div class="tags">${tags.join('')}</div></div>
   <div class="cast">${patoBubble()}${detVisible() ? detBubble() : ''}</div>`;

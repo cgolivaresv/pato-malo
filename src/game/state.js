@@ -27,5 +27,9 @@ export function newGame(id) {
     alert: {}, news: [], unread: 0, tab: 'act', dest: '', over: null, interpolShown: false, searched: {},
     lots: LOTS[id].count, items: START_ITEMS.map((x) => ({ ...x })), job: null, loan: null, offers: {}, robbed: {},
     days: 0, reward: null, perks: { press: 0, map: false, bus: 0, soplon: 0 },
+    // Calor por país: la noticia del golpe ya se filtró un poco a los vecinos
+    heatBy: { AR: 8, PE: 8, BO: 8 }, heatFloor: 0,
+    // Estación: en invierno la nieve cierra pasos cordilleranos
+    season: Math.random() < 0.5 ? 'invierno' : 'verano',
   };
 }
