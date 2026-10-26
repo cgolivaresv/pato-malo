@@ -12,6 +12,7 @@ import { zoomMe, zoomWorld, zoomBy } from './map.js';
 import { playTravel, hideStamp } from './fx.js';
 import { I } from './icons.js';
 import { startTutorial, tutNext, endTutorial } from './tutorial.js';
+import { playFromTitle, skipTitleIntro } from './title.js';
 
 let surrenderArmed = false;
 
@@ -27,6 +28,9 @@ const ACTIONS = {
   zoomIn: () => zoomBy(0.55),
   zoomOut: () => zoomBy(1.8),
   toggleStats: () => { ui.statsOpen = !ui.statsOpen; render(); },
+  // Pantalla de inicio
+  titlePlay: () => playFromTitle(),
+  titleSkip: () => skipTitleIntro(),
   // Tutorial
   tutorial: () => { if (S && !S.over) startTutorial(); else showCrimes(); },
   tutNext: () => tutNext(),
@@ -71,6 +75,8 @@ export function initEvents() {
 
   document.addEventListener('click', (e) => {
     if (e.target.closest('#stampLayer')) { hideStamp(); return; }
+    // Tocar la escena de inicio la salta (salvo los botones)
+    if (e.target.closest('#title') && !e.target.closest('[data-act]')) { skipTitleIntro(); return; }
     const el = e.target.closest('[data-act]');
     if (el && !el.disabled) {
       const fn = ACTIONS[el.dataset.act];

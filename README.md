@@ -69,12 +69,17 @@ src/
   ui/detective.js     Estado de ánimo y frases del detective McCuack
   ui/fx.js            Animación de viaje y sellos de McCuack
   ui/tutorial.js      Tutorial guiado de la primera fuga
+  ui/title.js         Pantalla de inicio animada
 public/
   favicon.png         Ícono del juego
   rastro-austral.html Prototipo anterior en modo detective
 art/original/         Arte original de Pato Malo (referencia, no se publica)
 art/detective-original/ Arte original del detective McCuack (referencia)
 ```
+
+## Pantalla de inicio
+
+Empieza con una escena nocturna: suena la alarma, la cinta policial y las sirenas barren la calle bajo la lluvia, Pato Malo entra corriendo, cae el sello del título y McCuack se asoma con su linterna. Después la cámara se aleja hasta el mapa de fuga, donde una ruta de escape se traza en bucle ciudad por ciudad mientras McCuack la sigue y marca cada lugar con una X. Tocar la pantalla salta la intro; con movimiento reducido se muestra directo el mapa.
 
 ## Interfaz
 

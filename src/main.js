@@ -5,6 +5,7 @@ import { initEvents } from './ui/events.js';
 import { render } from './ui/render.js';
 import { showCrimes } from './ui/screens.js';
 import { face } from './ui/pato.js';
+import { showTitle } from './ui/title.js';
 
 document.getElementById('brandFace').src = face('normal');
 
@@ -12,4 +13,5 @@ initMap();
 initEvents();
 render();
 zoomStart();
-showCrimes();
+// Pantalla de inicio; al tocar Jugar se abre la elección del golpe
+showTitle(showCrimes);
