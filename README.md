@@ -2,9 +2,9 @@
 
 Juego de escape en el navegador. Acabas de dar un golpe en una ciudad de Chile y la PDI te busca. Tienes que huir por Chile, Sudamérica y el mundo sin que te atrapen.
 
-## Cómo se juega
+**Jugar:** [cgolivaresv.github.io/pato-malo](https://cgolivaresv.github.io/pato-malo/)
 
-Abre `index.html` en cualquier navegador. No necesita instalación ni servidor.
+## Cómo se juega
 
 1. Elige un golpe: camión de valores, joyería u óleo colonial. Cada uno tiene un objetivo distinto.
 2. Muévete por el mapa en bus, avión o paso clandestino.
@@ -20,12 +20,45 @@ Abre `index.html` en cualquier navegador. No necesita instalación ni servidor.
 - **Interpol.** Después de un plazo, tu documento real es casi una sentencia.
 - **Recompensas diarias.** Cada 24 horas sin ser atrapado ganas dinero u objetos útiles.
 
-## Archivos
+## Desarrollo
 
-| Archivo | Qué es |
-|---|---|
-| `index.html` | Pato Malo, el juego principal |
-| `rastro-austral.html` | Prototipo anterior en modo detective |
+Necesitas Node.js 18 o más nuevo.
+
+```bash
+npm install      # instala Vite
+npm run dev      # servidor local con recarga automática
+npm run build    # genera la versión publicable en dist/
+```
+
+Cada vez que se sube un cambio a `main`, GitHub Actions compila el juego y lo publica en GitHub Pages.
+
+## Estructura
+
+```
+index.html            Esqueleto de la página
+src/
+  main.js             Punto de entrada
+  styles.css          Estilos y colores
+  data/
+    places.js         Países y 70 ciudades con coordenadas
+    geo.js            Agrupaciones: Sudamérica, ciudades grandes, aeropuertos, fronteras
+    content.js        Golpes, botín, objetos iniciales y recompensas
+    map.json          Contornos de países ya proyectados
+  lib/util.js         Utilidades (distancias, reloj, formato de dinero)
+  game/               Lógica: no depende de la interfaz
+    state.js          Estado de la partida (S)
+    risk.js           Riesgo de controles y medios de transporte
+    engine.js         Paso del tiempo, rastros, IA policial, recompensas, fin
+    actions.js        Esconderse, bajo mundo, viajar
+    money.js          Formas de conseguir dinero
+  ui/                 Interfaz
+    map.js            Mapa SVG y zoom
+    render.js         Barra de estado y pestañas
+    screens.js        Elegir golpe, informe y resultado
+    events.js         Manejador único de clics (data-act / data-arg)
+public/
+  rastro-austral.html Prototipo anterior en modo detective
+```
 
 ## Mapa
 
