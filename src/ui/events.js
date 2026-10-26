@@ -8,7 +8,7 @@ import { finish } from '../game/engine.js';
 import { render, toast, ui } from './render.js';
 import { destList } from './sheets.js';
 import { showCrimes, startGame, closeOv, begin } from './screens.js';
-import { zoomMe, zoomWorld } from './map.js';
+import { zoomMe, zoomWorld, zoomBy } from './map.js';
 import { playTravel, hideStamp } from './fx.js';
 import { I } from './icons.js';
 import { startTutorial, tutNext, endTutorial } from './tutorial.js';
@@ -24,6 +24,8 @@ const ACTIONS = {
   viewMap: () => { closeOv(); if (S) { S.tab = 'act'; render(); } zoomMe(); },
   zoomMe: () => zoomMe(),
   zoomWorld: () => zoomWorld(),
+  zoomIn: () => zoomBy(0.55),
+  zoomOut: () => zoomBy(1.8),
   toggleStats: () => { ui.statsOpen = !ui.statsOpen; render(); },
   // Tutorial
   tutorial: () => { if (S && !S.over) startTutorial(); else showCrimes(); },

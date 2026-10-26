@@ -287,8 +287,6 @@ const money=n=>'$'+Math.round(n).toLocaleString('es-CL');
 function dist(a,b){const R=6371,r=Math.PI/180,dl=(b.la-a.la)*r,dn=(b.lo-a.lo)*r;const h=Math.sin(dl/2)**2+Math.cos(a.la*r)*Math.cos(b.la*r)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 const DAYS=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 function clock(h){const t=8+h,d=Math.floor(t/24),hh=Math.floor(t%24),mm=Math.round((t%1)*60)%60;return `${DAYS[d%7]} ${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`}
-const gmaps=(q)=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
-const street=(c)=>`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${c.la},${c.lo}`;
 function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
 
 // ---------- GENERACIÓN DEL CASO ----------
@@ -509,7 +507,7 @@ function render(){
   const tabs=[['inv','Investigar'],['via','Viajar'],['exp','Expediente',S.clues.length]];
   let body='';
   if(S.tab==='inv')body=renderInv(c,cs);else if(S.tab==='via')body=renderVia(c);else body=renderExp();
-  $('#panel').innerHTML=`<div class="cityhead"><div class="eyebrow">${esc(crime().n)} · ${esc(co.n)}</div><h2>${esc(c.n)}</h2><div class="links"><a href="${gmaps(c.n+', '+co.n)}" target="_blank" rel="noopener">Abrir en Google Maps ↗</a><a href="${street(c)}" target="_blank" rel="noopener">Street View ↗</a></div></div>
+  $('#panel').innerHTML=`<div class="cityhead"><div class="eyebrow">${esc(crime().n)} · ${esc(co.n)}</div><h2>${esc(c.n)}</h2></div>
   <div class="tabs" role="tablist">${tabs.map(([k,n,cnt])=>`<button role="tab" type="button" aria-selected="${S.tab===k}" onclick="S.tab='${k}';render()">${n}${cnt?`<span class="n">${cnt}</span>`:''}</button>`).join('')}</div>
   <div class="tabbody">${body}</div>`;
   drawOverlay();
@@ -517,7 +515,7 @@ function render(){
 }
 function dis(m){return S.over||!canPay(m)?'disabled':''}
 function renderInv(c,cs){
-  let h=cs.places.map((p,j)=>`<div class="card"><div class="row"><h3>${esc(p.t)}</h3><a class="small" href="${gmaps(p.t+' '+c.n+' '+COUNTRIES[c.c].n)}" target="_blank" rel="noopener">mapa ↗</a></div>
+  let h=cs.places.map((p,j)=>`<div class="card"><div class="row"><h3>${esc(p.t)}</h3></div>
     ${p.done?(p.kind==='hide'?'':`<div class="who">${esc(p.w)}</div><div class="quote ${p.kind==='dead'?'dead':p.kind==='near'?'hot':''}">«${esc(p.text)}»</div>`):`<div class="act"><button class="btn" type="button" ${dis(COST.visit.m)} onclick="visit(${j})">Interrogar a ${esc(p.w.toLowerCase())}<span class="cost">${COST.visit.h} h · ${money(COST.visit.m)}</span></button></div>`}</div>`).join('');
   h+=`<div class="sec">Recursos de la brigada</div>
   <div class="card"><div class="row"><h3>Cámaras de seguridad</h3><span class="small">rasgos del sospechoso</span></div>${cs.cam?`<div class="quote ${cs.role==='dead'?'dead':''}">${esc(cs.cam)}</div>`:`<div class="act"><button class="btn ghost" type="button" ${dis(COST.cam.m)} onclick="camera()">Revisar grabaciones<span class="cost">${COST.cam.h} h · ${money(COST.cam.m)}</span></button></div>`}</div>

@@ -46,7 +46,7 @@ src/
     places.js         Países y 70 ciudades con coordenadas
     geo.js            Agrupaciones: Sudamérica, ciudades grandes, aeropuertos, fronteras
     content.js        Golpes, botín, objetos iniciales y recompensas
-    map.json          Contornos de países ya proyectados
+    map.json          Contornos de cada país ya proyectados, con punto para su nombre
   lib/util.js         Utilidades (distancias, reloj, formato de dinero)
   game/               Lógica: no depende de la interfaz
     state.js          Estado de la partida (S)
@@ -56,7 +56,7 @@ src/
     money.js          Formas de conseguir dinero
     heat.js           Calor por país
   ui/                 Interfaz
-    map.js            Mapa SVG y zoom
+    map.js            Mapa de fuga: capas, etiquetas y gestos (arrastrar, pellizcar, rueda)
     render.js         Barra de estado, aviso de peligro, franja de ciudad y barra de acciones
     sheets.js         Hojas: Esconderse, Moverse, Plata, Bajo mundo y Noticias
     components.js     Tarjetas de decisión (tiempo, costo y riesgo)
@@ -90,4 +90,6 @@ El **Detective Patrick McCuack**, jefe de la Brigada de Robos, encabeza la perse
 
 ## Mapa
 
-Los contornos de los países vienen de [Natural Earth](https://www.naturalearthdata.com/) (dominio público), vía el paquete `world-atlas`. Cada ciudad tiene enlaces a Google Maps y Street View.
+El mapa es propio del juego: un "mapa de fuga" en SVG que se arrastra, se pellizca y se acerca con la rueda o con doble toque. Muestra fronteras, la cordillera de los Andes (nevada en invierno), el ecuador y los trópicos, el calor de cada país pintado en rojo, tu recorrido, la ruta al destino elegido, brújula y escala. Los nombres de ciudades aparecen según el zoom sin pisarse. No usa servicios externos de mapas.
+
+Los contornos de los países vienen de [Natural Earth](https://www.naturalearthdata.com/) (dominio público), vía el paquete `world-atlas`.

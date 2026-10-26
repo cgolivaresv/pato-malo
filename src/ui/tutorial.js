@@ -17,7 +17,7 @@ function objectiveText() {
 const STEPS = [
   { sel: null, mood: 'burlo', title: '¡Hola! Soy Pato Malo', text: () => 'Acabo de dar el golpe y la PDI ya me anda buscando. Te muestro lo básico en un minuto para que me ayudes a escapar.' },
   { sel: '#stats', mood: 'normal', title: 'Hora, plata y calor', text: () => 'El calor es cuánto me busca la policía en el país donde estoy. Mientras más alto, más peligrosos los controles. Toca esta barra para ver el calor de cada país.' },
-  { sel: '.mapwrap', mood: 'normal', title: 'El mapa', text: () => 'Toca cualquier ciudad para ver cómo llegar. Las X rojas son rastros míos que la PDI ya descubrió. Los cuadros verdes son casas seguras de mi red.' },
+  { sel: '.mapwrap', mood: 'normal', title: 'El mapa', text: () => 'Arrástralo para moverte y pellízcalo para acercar. Toca una ciudad para ver cómo llegar. Las X rojas son rastros míos que la PDI ya descubrió, las casitas verdes son casas seguras, y el tono rojo de cada país es su calor.' },
   { sel: '.dock-btn[data-arg="move"]', mood: 'guino', title: 'Moverse', text: () => 'El avión es rápido pero pide documento: con el real, me ubican al tiro. El bus es lento pero más silencioso. Cada país tiene su propio calor, así que cruzar una frontera me enfría. En invierno la nieve cierra los pasos a Argentina.' },
   { sel: '.dock-btn[data-arg="hide"]', mood: 'normal', title: 'Esconderse', text: () => 'Dormir baja el calor. Una casa segura es lo mejor: nadie registra mi nombre. Ojo, después de 20 horas despierto me quedo dormido donde sea.' },
   { sel: '.dock-btn[data-arg="money"]', mood: 'feliz', title: 'Plata', text: () => 'Si me quedo corto, aquí puedo vender mis cosas o parte del botín, hacer encargos o pedirle al usurero. Todo deja huella.' },

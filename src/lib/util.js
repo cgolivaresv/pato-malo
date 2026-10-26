@@ -1,5 +1,4 @@
 // Utilidades generales.
-import { COUNTRIES } from '../data/geo.js';
 
 export const $ = (s) => document.querySelector(s);
 export const R = Math.random;
@@ -30,9 +29,6 @@ export function clock(h) {
   const t = 22 + h, d = Math.floor(t / 24), hh = Math.floor(t % 24), mm = Math.floor(((t % 1) * 60) / 15) * 15;
   return `${DAYS[d % 7]} ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
 }
-
-export const gmaps = (c) => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(c.n + ', ' + COUNTRIES[c.c].n);
-export const street = (c) => `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${c.la},${c.lo}`;
 
 // localStorage con manejo de errores (modo privado, almacenamiento bloqueado)
 export function store(k, v) {

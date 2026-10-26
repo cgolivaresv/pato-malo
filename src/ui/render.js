@@ -1,7 +1,7 @@
 // Dibuja la pantalla de juego: barra superior, aviso de peligro, franja de la ciudad,
 // barra de acciones y la hoja abierta. Los botones usan data-act / data-arg (ver events.js).
 import { CITY, COUNTRIES, HUB } from '../data/geo.js';
-import { $, esc, money, clock, gmaps, street, store } from '../lib/util.js';
+import { $, esc, money, clock, store } from '../lib/util.js';
 import { S, crime, me, disguised, policeHere } from '../game/state.js';
 import { drawOverlay } from './map.js';
 import { patoBubble } from './pato.js';
@@ -95,7 +95,6 @@ function renderStrip() {
   if (HUB.has(c.id)) tags.push(`<span class="tag">${I.plane}Vuelos internacionales</span>`);
   if (disguised()) tags.push(`<span class="tag">${I.mask}Disfrazado</span>`);
   if (S.season === 'invierno' && ['CL', 'AR'].includes(c.c)) tags.push(`<span class="tag cold">${I.snow}Invierno</span>`);
-  tags.push(`<a class="tag link" href="${gmaps(c)}" target="_blank" rel="noopener">${I.map}Maps</a><a class="tag link" href="${street(c)}" target="_blank" rel="noopener">${I.eye}Street View</a>`);
   $('#strip').innerHTML = `<div class="city"><div class="c-eyebrow">${esc(cr.n)} · ${esc(COUNTRIES[c.c].n)}</div><h2>${esc(c.n)}</h2><div class="tags">${tags.join('')}</div></div>
   <div class="cast">${patoBubble()}${detVisible() ? detBubble() : ''}</div>`;
 }
