@@ -5,39 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Pato Malo</title>
   <meta name="description" content="Juego de escape: eres el prófugo y huyes de la PDI e Interpol por Chile, Sudamérica y el mundo.">
-  <meta name="theme-color" content="#16131a">
+  <meta name="theme-color" content="#121016">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;800&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 </head>
 <body>
-  <header class="top">
-    <div class="brand"><img id="brandFace" alt="" width="36" height="36"><span>Pato Malo</span><i aria-hidden="true"></i></div>
-    <div class="stats" id="stats"></div>
-  </header>
+  <div class="app">
+    <header class="topbar">
+      <button class="brand" type="button" data-act="crimes" aria-label="Pato Malo: ver golpes">
+        <img id="brandFace" alt="" width="34" height="34"><span>Pato Malo</span>
+      </button>
+      <button class="stats" id="stats" type="button" data-act="toggleStats" aria-expanded="false"></button>
+    </header>
+    <div class="banner" id="banner" role="status" hidden></div>
 
-  <div class="grid">
-    <div class="mapwrap">
-      <svg id="map" role="img" aria-label="Mapa de la fuga"></svg>
-      <div class="legend">
-        <span><b style="background:#ff9a3c"></b>Pato Malo</span>
-        <span><b style="background:#ff5d5d"></b>Rastro conocido</span>
-        <span><b style="background:#7bd88f"></b>Casa segura</span>
-        <span><b style="background:#4aa8ff"></b>McCuack (con soplón)</span>
+    <main class="stage">
+      <div class="mapwrap">
+        <svg id="map" role="img" aria-label="Mapa de la fuga"></svg>
+        <div class="mapctl">
+          <button type="button" data-act="zoomMe" aria-label="Acercar a tu posición"><span data-ico="target"></span></button>
+          <button type="button" data-act="zoomWorld" aria-label="Ver el mundo"><span data-ico="globe"></span></button>
+        </div>
+        <div class="legend" aria-hidden="true">
+          <span><b class="lg-me"></b>Tú</span><span><b class="lg-trace"></b>Rastro</span><span><b class="lg-safe"></b>Casa segura</span><span><b class="lg-cop"></b>McCuack</span>
+        </div>
       </div>
-      <div class="mapctl">
-        <button id="zMe" type="button" data-act="zoomMe">Acercar</button>
-        <button id="zWorld" type="button" data-act="zoomWorld">Mundo</button>
-      </div>
-    </div>
-    <section class="panel" id="panel"></section>
+
+      <aside class="side">
+        <section class="strip" id="strip" aria-live="polite"></section>
+        <nav class="dock" id="dock" aria-label="Acciones"></nav>
+        <div class="scrim" id="scrim" data-act="closeSheet" hidden></div>
+        <section class="sheet" id="sheet" aria-label="Opciones"></section>
+      </aside>
+    </main>
   </div>
 
   <div class="overlay" id="ov" hidden></div>
-  <div class="toast" id="toast" hidden></div>
+  <div class="toast" id="toast" role="status" hidden></div>
   <div class="fx" id="fx" hidden></div>
+  <div class="stamp-layer" id="stampLayer" hidden></div>
 
   <script type="module" src="/src/main.js"></script>
 </body>

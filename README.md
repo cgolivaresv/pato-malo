@@ -53,20 +53,27 @@ src/
     money.js          Formas de conseguir dinero
   ui/                 Interfaz
     map.js            Mapa SVG y zoom
-    render.js         Barra de estado y pestañas
+    render.js         Barra de estado, aviso de peligro, franja de ciudad y barra de acciones
+    sheets.js         Hojas: Esconderse, Moverse, Plata, Bajo mundo y Noticias
+    components.js     Tarjetas de decisión (tiempo, costo y riesgo)
+    icons.js          Iconos SVG
     screens.js        Elegir golpe, informe y resultado
     events.js         Manejador único de clics (data-act / data-arg)
   assets/pato/        Ilustración y 8 expresiones del pato (WebP, fondo limpio)
   assets/detective/   Ilustración y 6 expresiones del detective McCuack
   ui/pato.js          Estado de ánimo del pato y sus frases
   ui/detective.js     Estado de ánimo y frases del detective McCuack
-  ui/fx.js            Animación de huida al viajar
+  ui/fx.js            Animación de viaje y sellos de McCuack
 public/
   favicon.png         Ícono del juego
   rastro-austral.html Prototipo anterior en modo detective
 art/original/         Arte original de Pato Malo (referencia, no se publica)
 art/detective-original/ Arte original del detective McCuack (referencia)
 ```
+
+## Interfaz
+
+Diseño "expediente de fuga": en el teléfono, una sola pantalla con barra de estado compacta, aviso de peligro con cinta policial, mapa grande y una barra de acciones fija abajo que abre hojas deslizables. Cada opción es una tarjeta que muestra tiempo, costo y riesgo de un vistazo. En escritorio, el mapa queda a la izquierda y las acciones en un panel lateral.
 
 ## Personaje
 

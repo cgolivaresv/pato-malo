@@ -5,10 +5,12 @@ import { S } from '../game/state.js';
 import { rest, lowProfile, disguise, soplon, forge, searchFence, sell, travel } from '../game/actions.js';
 import { sellLot, sellItem, acceptJob, robbery, borrow, repay } from '../game/money.js';
 import { finish } from '../game/engine.js';
-import { render, toast } from './render.js';
+import { render, toast, ui } from './render.js';
+import { destList } from './sheets.js';
 import { showCrimes, startGame, closeOv, begin } from './screens.js';
 import { zoomMe, zoomWorld } from './map.js';
-import { playTravel } from './fx.js';
+import { playTravel, hideStamp } from './fx.js';
+import { I } from './icons.js';
 
 let surrenderArmed = false;
 
@@ -18,10 +20,15 @@ const ACTIONS = {
   start: (id) => startGame(id),
   begin: () => begin(),
   closeOv: () => closeOv(),
-  viewMap: () => { closeOv(); zoomMe(); },
-  tab: (k) => { S.tab = k; render(); },
+  viewMap: () => { closeOv(); if (S) { S.tab = 'act'; render(); } zoomMe(); },
   zoomMe: () => zoomMe(),
   zoomWorld: () => zoomWorld(),
+  toggleStats: () => { ui.statsOpen = !ui.statsOpen; render(); },
+  // Hojas de acciones: tocar la abierta la cierra
+  sheet: (id) => { S.tab = S.tab === id ? 'act' : id; render(); if (id === 'move') zoomMe(); },
+  closeSheet: () => { S.tab = 'act'; render(); },
+  filter: (k) => { ui.filter = k; ui.q = ''; render(); },
+  dest: (id) => { S.dest = id || ''; render(); zoomMe(); },
   // Esconderse y bajo mundo
   rest: (kind) => rest(kind),
   lowProfile: () => lowProfile(),
@@ -52,24 +59,40 @@ const ACTIONS = {
 };
 
 export function initEvents() {
+  // Iconos fijos del HTML
+  document.querySelectorAll('[data-ico]').forEach((el) => { el.outerHTML = I[el.dataset.ico]; });
+
   document.addEventListener('click', (e) => {
+    if (e.target.closest('#stampLayer')) { hideStamp(); return; }
     const el = e.target.closest('[data-act]');
     if (el && !el.disabled) {
       const fn = ACTIONS[el.dataset.act];
       if (fn) fn(el.dataset.arg);
       return;
     }
-    // Tocar una ciudad en el mapa la elige como destino
+    // Tocar una ciudad en el mapa la elige como destino y abre "Moverse"
     const city = e.target.closest('#map g[data-id]');
     if (city && S && !S.over) {
       S.dest = city.dataset.id === S.cur ? '' : city.dataset.id;
-      S.tab = 'via';
+      S.tab = 'move';
       render();
     }
   });
-  document.addEventListener('change', (e) => {
-    if (e.target.id === 'dest') { S.dest = e.target.value; render(); zoomMe(); }
+
+  // Buscador de destinos: solo redibuja la lista para no perder el foco
+  document.addEventListener('input', (e) => {
+    if (e.target.id !== 'q') return;
+    ui.q = e.target.value;
+    $('#destList').innerHTML = destList();
+    document.querySelectorAll('.filter').forEach((b) => b.setAttribute('aria-pressed', !ui.q && b.dataset.arg === ui.filter));
   });
-  $('#zMe').dataset.act = 'zoomMe';
-  $('#zWorld').dataset.act = 'zoomWorld';
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!$('#stampLayer').hidden) hideStamp();
+    else if (S && S.tab !== 'act' && $('#ov').hidden) { S.tab = 'act'; render(); }
+  });
+
+  let rz;
+  addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => S && render(), 200); });
 }
