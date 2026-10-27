@@ -7,6 +7,8 @@ import { $, esc, store } from '../lib/util.js';
 import { PATO, face } from './pato.js';
 import { MCCUACK, detFace } from './detective.js';
 import { P } from './map.js';
+import { music, musicLevel } from '../audio/sound.js';
+import { sndButton } from './events.js';
 
 const ROUTES = [
   ['talca', 'santiago', 'mendoza', 'cordoba', 'asuncion', 'brasilia'],
@@ -65,8 +67,11 @@ export function showTitle(play) {
     </div>
   </div>
   <button type="button" class="ti-skip" data-act="titleSkip">Saltar intro</button>
+  <button type="button" class="ti-snd snd" data-act="sound" aria-label="Sonido"></button>
   <div class="ti-version">v${__APP_VERSION__} · ${__APP_BUILD__}</div>`;
   document.body.appendChild(el);
+  sndButton();
+  music(true); musicLevel(1);
   live = true;
   initMap();
   if (reduced()) { toMap(true); return; }

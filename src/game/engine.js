@@ -10,6 +10,7 @@ import { rest } from './actions.js';
 import { render, toast } from '../ui/render.js';
 import { showEnd } from '../ui/screens.js';
 import { zoomMe } from '../ui/map.js';
+import { sfx, music } from '../audio/sound.js';
 
 // Un rastro se crea ahora y la policía lo descubre "delay" horas después
 export function addTrace(city, delay, txt) { S.traces.push({ city, at: S.hours + delay, txt, shown: false }); }
@@ -58,6 +59,7 @@ export function advance(h, ctx) {
     if (ctx.where === 'city' && !copsBefore && policeHere() && left > 0.5) {
       news(S.hours, `¡Sirenas! La brigada de McCuack llegó a ${me().n}. Te despertaste a tiempo.`, 'alert');
       toast(`¡La brigada llegó a ${me().n}!`);
+      sfx('siren');
       S.awake = Math.max(0, S.awake - (h - left) * 0.5);
       return 'interrupted';
     }
@@ -132,6 +134,7 @@ export function giveReward() {
   S.reward = { day: S.days, n: r.n, d: txt };
   news(S.hours, `Día ${S.days} sin ser atrapado. Recompensa: ${r.n}. ${txt}`, 'me');
   toast(`Día ${S.days} libre: ${r.n}`);
+  sfx('cash');
 }
 
 export function caught(msg) { finish(false, msg); }

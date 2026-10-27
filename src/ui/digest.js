@@ -6,6 +6,7 @@ import { S } from '../game/state.js';
 import { I } from './icons.js';
 import { face } from './pato.js';
 import { detFace } from './detective.js';
+import { sfx } from '../audio/sound.js';
 
 const MAX = 6;
 const RANK = { alert: 0, police: 1, me: 2 };
@@ -38,6 +39,10 @@ export function renderDigest() {
     police ? `<span class="dg-chip police">${I.shield}${police} McCuack</span>` : '',
   ].join('');
   const more = n - shown.length;
+  if (n > lastCount) {
+    const fresh = items.slice(lastCount);
+    sfx(fresh.some((i) => i.cls === 'alert') ? 'alert' : fresh.some((i) => i.cls === 'police') ? 'radio' : 'news');
+  }
   d.className = `digest ${kind}${n > lastCount ? ' pop' : ''}`;
   d.innerHTML = `<div class="dg-head">
       <img src="${kind === 'me' ? face('normal') : detFace(alerts ? 'burlon' : 'serio')}" alt="" width="30" height="30">

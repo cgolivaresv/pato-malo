@@ -15,6 +15,7 @@ import { showEvent } from './screens.js';
 import { inZone, checkAt, zoneRadius } from '../game/pursuit.js';
 import { CONTACTS } from '../data/content.js';
 import { renderDigest } from './digest.js';
+import { music, musicLevel } from '../audio/sound.js';
 
 // Estado solo de interfaz (no forma parte de la partida)
 export const ui = { statsOpen: false, q: '', filter: 'cerca', lastShown: 0, game: null };
@@ -45,7 +46,15 @@ export function render() {
   // Un evento esperando decisión
   if (S.event && !S.over) showEvent();
   renderDigest();
+  // Música según el peligro
+  if (!S.over) {
+    music(true);
+    const c = me();
+    musicLevel(policeHere() || (S.police.arrive != null && S.police.target === c.id) ? 2 : S.heat >= 45 || inZone(c) || checkAt(c.id) || freshNews() ? 1 : 0);
+  }
 }
+
+const freshNews = () => S.traces.some((t) => t.shown && S.hours - t.at < 3);
 
 function renderIdle() {
   const car = store('fuga-career') || { escapes: 0, played: 0, points: 0 };

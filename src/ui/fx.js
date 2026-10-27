@@ -1,4 +1,5 @@
 // Momentos animados: huida al viajar y sellos de McCuack.
+import { sfx } from '../audio/sound.js';
 import { CITY } from '../data/geo.js';
 import { $, esc } from '../lib/util.js';
 import { PATO } from './pato.js';
@@ -9,6 +10,7 @@ const VERB = { air: 'Volando a', bus: 'En bus a', paso: 'Cruzando la cordillera 
 let busy = false;
 
 export function playTravel(toId, mode) {
+  sfx(mode === 'air' ? 'air' : mode === 'paso' ? 'paso' : mode === 'barco' ? 'ship' : 'bus');
   if (busy || reduced()) return Promise.resolve();
   busy = true;
   const fx = $('#fx');
@@ -22,6 +24,7 @@ export function playTravel(toId, mode) {
 // Sello de McCuack cuando la PDI descubre un rastro tuyo
 let stampTimer;
 export function playStamp(kind, city) {
+  sfx('stamp');
   const layer = $('#stampLayer');
   const TXT = { ubicado: ['Ubicado', `Pista nueva en ${city}`] };
   const [word, sub] = TXT[kind];

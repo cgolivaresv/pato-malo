@@ -433,6 +433,11 @@ a { color: var(--sodium); }
 .mode.closed::after { content: ""; position: absolute; left: 4px; right: 4px; top: 50%; height: 2px; background: #6b6170; transform: rotate(-35deg); }
 
 /* ---------- Tutorial ---------- */
+.snd { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); color: var(--muted); display: grid; place-items: center; }
+.snd .ico { width: 17px; height: 17px; }
+.snd:hover, .help:hover { color: var(--ink); }
+.ti-snd { position: absolute; z-index: 3; top: calc(12px + env(safe-area-inset-top, 0px)); right: var(--gutter-r); width: 40px; height: 40px; background: #0b0910aa; color: var(--ink); }
+.ti-snd .ico { width: 20px; height: 20px; }
 .help { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); font-family: var(--f-display); font-weight: 900; font-size: 17px; color: var(--muted); display: grid; place-items: center; }
 .tut { position: fixed; inset: 0; z-index: 35; }
 .tut.center { background: #0a080cd9; }

@@ -17,6 +17,22 @@ import { I } from './icons.js';
 import { startTutorial, tutNext, endTutorial, wantTutorial } from './tutorial.js';
 import { playFromTitle, skipTitleIntro } from './title.js';
 import { dismissDigest, renderDigest } from './digest.js';
+import { unlock, sfx, cycleSound, soundMode } from '../audio/sound.js';
+
+// Sonido de cada botón (el viaje, los sellos y los eventos suenan por su cuenta)
+const SOUND_OF = {
+  sheet: (a) => (S && S.tab === a ? 'close' : 'open'), closeSheet: 'close', closeOv: 'close', digestOk: 'close',
+  rest: 'rest', lowProfile: 'rest', disguise: 'swish', soplon: 'ask', ask: 'ask',
+  forgeCheap: 'paper', forgeTop: 'paper', start: 'paper', crimes: 'paper',
+  sellFence: 'cash', sellLot: 'cash', sellItem: 'cash', acceptJob: 'cash', robbery: 'cash', borrow: 'cash', repay: 'cash', hire: 'cash',
+  leave: (k) => (k === 'captain' ? 'ship' : 'air'), begin: 'siren', eventChoice: 'resolve', surrender: 'deny',
+  travel: null, sound: null, titleSkip: null,
+};
+const SND_LABEL = { all: 'Música y sonidos', sfx: 'Solo sonidos (sin música)', off: 'Silencio' };
+export function sndButton() {
+  const m = soundMode();
+  document.querySelectorAll('[data-act="sound"]').forEach((b) => { b.innerHTML = m === 'all' ? I.music : m === 'sfx' ? I.sound : I.mute; b.setAttribute('aria-label', `Sonido: ${SND_LABEL[m]}. Tocar para cambiar`); b.title = SND_LABEL[m]; });
+}
 
 let surrenderArmed = false;
 
@@ -31,6 +47,7 @@ const ACTIONS = {
   zoomWorld: () => zoomWorld(),
   zoomIn: () => zoomBy(0.55),
   zoomOut: () => zoomBy(1.8),
+  sound: () => { const m = cycleSound(); sndButton(); sfx('tap'); toast(SND_LABEL[m]); },
   digestOk: () => { dismissDigest(); render(); },
   toggleStats: () => { ui.statsOpen = !ui.statsOpen; render(); },
   // Pantalla de inicio
@@ -87,6 +104,10 @@ export function initEvents() {
   // Iconos fijos del HTML
   document.querySelectorAll('[data-ico]').forEach((el) => { el.outerHTML = I[el.dataset.ico]; });
 
+  // El navegador solo deja sonar audio después de un toque
+  for (const ev of ['pointerdown', 'keydown', 'touchend']) document.addEventListener(ev, unlock, { passive: true });
+  sndButton();
+
   document.addEventListener('click', (e) => {
     if (e.target.closest('#stampLayer')) { hideStamp(); return; }
     // Tocar fuera del parte lo da por leído; la próxima acción trae su propio parte
@@ -97,7 +118,11 @@ export function initEvents() {
     // Tocar la escena de inicio la salta (salvo los botones)
     if (e.target.closest('#title') && !e.target.closest('[data-act]')) { skipTitleIntro(); return; }
     const el = e.target.closest('[data-act]');
+    if (el && el.disabled) sfx('deny');
     if (el && !el.disabled) {
+      const snd = el.dataset.act in SOUND_OF ? SOUND_OF[el.dataset.act] : 'tap';
+      const name = typeof snd === 'function' ? snd(el.dataset.arg) : snd;
+      if (name) sfx(name);
       const fn = ACTIONS[el.dataset.act];
       if (fn) fn(el.dataset.arg);
       if (read) renderDigest();

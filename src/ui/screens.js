@@ -13,6 +13,7 @@ import { endStamp } from './fx.js';
 import { currentEvent, eventChoices } from '../game/events.js';
 import { decision, chips } from './components.js';
 import { maybeTutorial } from './tutorial.js';
+import { sfx, music } from '../audio/sound.js';
 
 const ov = () => $('#ov');
 const modal = (label, inner, cls = '') => `<div class="modal ${cls}" role="dialog" aria-modal="true" aria-label="${label}"><div class="tape" aria-hidden="true"></div><div class="in">${inner}</div></div>`;
@@ -70,6 +71,8 @@ export function startGame(id) {
 
 export function showEnd() {
   const o = S.over;
+  music(false);
+  sfx(o.win ? 'win' : 'lose');
   ov().hidden = false;
   ov().innerHTML = modal('Resultado', `
   ${endStamp(o.win)}
@@ -91,6 +94,7 @@ export function showEvent() {
   const key = `${e.id}-${S.evCount}-${done ? 'r' : 'q'}`;
   if (!ov().hidden && ov().dataset.ev === key) return;
   ov().dataset.ev = key;
+  if (!done) sfx('event');
   ov().hidden = false;
   const img = e.face === 'det' ? detFace(done ? 'burlon' : 'serio') : face(done ? 'burlo' : e.mood || 'normal');
   const imgCls = e.face === 'det' ? 'det-face' : 'pato-face';

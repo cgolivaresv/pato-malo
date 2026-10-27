@@ -25,6 +25,7 @@ Juego de escape en el navegador. Acabas de dar un golpe en una ciudad de Chile y
 - **Recompensas diarias.** Cada 24 horas sin ser atrapado ganas dinero u objetos útiles.
 - **Calor por país.** Cada país tiene su propio calor. La noticia sale donde te descubren y se filtra un poco a los vecinos; al cruzar una frontera llegas con el calor de ese país.
 - **Geografía real.** Invierno o verano: en invierno la nieve cierra los pasos entre Chile y Argentina en el centro y sur. Transbordador de Chacao a Chiloé, barcaza de la Carretera Austral a Coyhaique (08:00), bus a Magallanes por Argentina, barco semanal Puerto Montt–Puerto Natales y controles aduaneros de la Ruta 5 en el Norte Grande.
+- **Música y sonidos.** Tema policial noir generado en el navegador (Web Audio, sin archivos): bajo, batería con swing y guitarra con eco. Se acelera y se pone más tensa con el peligro, y suena una sirena lejana cuando la brigada está en tu ciudad. Cada botón, viaje, sello, evento y final tiene su sonido. El botón de nota musical cambia entre música y sonidos, solo sonidos o silencio.
 - **Tutorial.** Pato Malo guía la primera fuga; se puede repetir desde la pantalla de inicio o con el botón «?».
 
 ## Desarrollo
@@ -80,6 +81,7 @@ src/
   ui/fx.js            Animación de viaje y sellos de McCuack
   ui/tutorial.js      Tutorial guiado de la primera fuga
   ui/title.js         Pantalla de inicio animada
+  audio/sound.js      Música y efectos sintetizados con Web Audio
 public/
   favicon.png         Ícono del juego
   rastro-austral.html Prototipo anterior en modo detective
