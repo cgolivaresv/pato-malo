@@ -7,7 +7,7 @@ import { news } from '../game/engine.js';
 import { render } from './render.js';
 import { zoomMe } from './map.js';
 import { PATO, face, quip } from './pato.js';
-import { MCCUACK, DET_NAME, MOTTO, detBubble, detFace } from './detective.js';
+import { MCCUACK, DET_NAME, MOTTO, detBubble, detFace, detQuip } from './detective.js';
 import { I } from './icons.js';
 import { endStamp } from './fx.js';
 import { currentEvent, eventChoices } from '../game/events.js';
@@ -63,7 +63,7 @@ export function startGame(id) {
   <p>${esc(cr.d)}</p>
   <p class="hint">Para salir del continente arma tu plan en la hoja <b>Escape</b>: busca al capitán, al piloto o al falsificador maestro.</p>
   <dl class="facts"><dt>${I.house}Casas seguras</dt><dd>${S.safe.map((i) => esc(CITY[i].n)).join(', ')}</dd>${S.buyer ? `<dt>${I.pin}Comprador</dt><dd>${esc(CITY[S.buyer].n)}</dd>` : ''}<dt>${I.globe}Interpol</dt><dd>en ${cr.interpol} h</dd><dt>${S.season === 'invierno' ? I.snow : I.sun}Estación</dt><dd>${S.season === 'invierno' ? 'Invierno: la nieve cierra los pasos a Argentina en el centro y sur' : 'Verano: los pasos cordilleranos están abiertos'}</dd></dl>
-  <div class="det-bubble"><p><b>McCuack</b> Alerta a todas las unidades: un pato con gorra y lentes oscuros. La ley también tiene patas.</p><img class="det-face" src="${detFace('serio')}" alt="" width="56" height="56"></div>
+  <div class="det-bubble"><p><b>McCuack</b> ${esc(detQuip('inicio'))}</p><img class="det-face" src="${detFace('serio')}" alt="" width="56" height="56"></div>
   <div class="act-row"><button class="btn big" type="button" data-act="begin">Empezar la fuga</button></div>`, 'brief');
   render();
 }

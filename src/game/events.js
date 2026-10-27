@@ -15,6 +15,15 @@ const here = () => me().n;
 const pct = (p) => `${Math.round(p * 100)}%`;
 const lvl = (p) => (p < 0.15 ? 0 : p < 0.35 ? 1 : 2);
 
+// Lo que dice McCuack cuando llama: culto, formal e irónico
+const CALLS = [
+  'Sé que está cerca, señor Pato. La ley también tiene patas.',
+  'Buenas noches. Llamo para comentarle que su fotografía de prontuario no le hace justicia.',
+  'No cuelgue, por favor. Estamos rastreando… digo, conversando.',
+  'Disculpe la hora. Los detectives no dormimos; los prófugos, por lo visto, tampoco.',
+  'Le hablo como un caballero a otro: entréguese antes de que se me enfríe el té.',
+];
+
 export const EVENTS = [
   {
     id: 'taxista', w: 3, mood: 'sorprendido', title: 'El taxista te reconoce',
@@ -128,7 +137,7 @@ export const EVENTS = [
   {
     id: 'llamada', w: 3, face: 'det', title: 'Llamada de McCuack', max: 2,
     when: () => S.traces.filter((t) => t.shown).length >= 2,
-    text: () => 'Suena tu celular. Una voz grave: «Sé que estás cerca, pato. La ley también tiene patas.»',
+    text: () => `Suena tu celular. Una voz grave y muy educada: «${CALLS[Math.floor(S.hours) % CALLS.length]}»`,
     choices: () => [
       { label: 'Provocarlo', desc: 'Si habla de más, sabrás dónde está su brigada.', chips: { riskText: 'Calor +5', riskLvl: 1 },
         run: () => { heatHere(5); S.soplonUntil = Math.max(S.soplonUntil, S.hours + 12); return 'Se enojó y habló de más. Durante 12 h sabes qué rastros tuyos está por descubrir.'; } },

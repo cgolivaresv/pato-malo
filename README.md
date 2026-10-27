@@ -97,11 +97,11 @@ Diseño "expediente de fuga": en el teléfono, una sola pantalla con barra de es
 
 ## Personaje
 
-El pato reacciona a lo que pasa en la fuga: se burla en una casa segura, se asusta con una noticia nueva o con la PDI cerca, se enoja con el calor alto, guiña disfrazado, ríe si escapas y queda triste si lo atrapan. Las imágenes del juego son recortes limpios del paquete original en `art/original/`, con el fondo quitado y convertidos a WebP.
+El pato habla en chileno de la calle y reacciona a lo que pasa en la fuga: se burla en una casa segura, se asusta con una noticia nueva o con la PDI cerca, se enoja con el calor alto, se pone nervioso en un control o en la zona de búsqueda, se queja del sueño y de andar sin lucas, guiña disfrazado, ríe si escapas y queda triste si lo atrapan. Las imágenes del juego son recortes limpios del paquete original en `art/original/`, con el fondo quitado y convertidos a WebP.
 
 ## El rival
 
-El **Detective Patrick McCuack**, jefe de la Brigada de Robos, encabeza la persecución. Aparece en el mapa cuando pagas al soplón, habla cuando descubre un rastro tuyo y comenta el final de cada fuga. Su lema: «La ley también tiene patas».
+El **Detective Patrick McCuack**, jefe de la Brigada de Robos, encabeza la persecución. Habla culto, formal e irónico, y siempre trata de usted al «señor Pato». Aparece en el mapa cuando pagas al soplón, habla cuando descubre un rastro tuyo y comenta el final de cada fuga. Su lema: «La ley también tiene patas».
 
 ## Mapa
 
