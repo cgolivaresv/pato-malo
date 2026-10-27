@@ -22,7 +22,7 @@ const STEPS = [
   { sel: '.dock-btn[data-arg="hide"]', mood: 'normal', title: 'Esconderse', text: () => 'Dormir baja el calor. Una casa segura es lo mejor: nadie registra mi nombre. Ojo, después de 20 horas despierto me quedo dormido donde sea.' },
   { sel: '.dock-btn[data-arg="money"]', mood: 'feliz', title: 'Plata', text: () => 'Si me quedo corto, aquí puedo vender mis cosas o parte del botín, hacer encargos o pedirle al usurero. Todo deja huella.' },
   { sel: '.dock-btn[data-arg="under"]', mood: 'guino', title: 'Escape', text: () => 'No basta con tomar un avión: necesito un capitán de carguero, un piloto de avioneta o un falsificador maestro. Aquí pregunto por ellos en el bajo mundo. Ojo, que los rumores a veces son mentira: si dos me dicen lo mismo, seguro es cierto.' },
-  { sel: '.dock-btn[data-arg="news"]', mood: 'noticia', title: 'Noticias', text: () => 'Lo que hago se descubre horas después. Aquí me entero de lo que sabe la policía. Cuando aparezca McCuack con su sello, hay que moverse.' },
+  { sel: '.dock-btn[data-arg="news"]', mood: 'noticia', title: 'Noticias', text: () => 'Lo que hago se descubre horas después. Después de cada acción te muestro un parte con todo lo nuevo, con las alertas primero; aquí queda el historial completo. Cuando aparezca McCuack con su sello, hay que moverse.' },
   { sel: '#strip', mood: 'feliz', title: 'Nuestro objetivo', text: () => `Tenemos que ${objectiveText()}. ¡Arranquemos!` },
 ];
 

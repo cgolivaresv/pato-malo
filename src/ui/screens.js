@@ -54,6 +54,7 @@ export function startGame(id) {
   news(0, `Golpe consumado en ${c.n}: ${cr.loot}. Tienes ${cr.alarm} h antes de que suene la alarma.`, 'me');
   news(0, `Tu red tiene casas seguras en ${S.safe.map((i) => CITY[i].n).join(', ')}.`, 'me');
   if (S.buyer) news(0, `El comprador del óleo te espera en ${CITY[S.buyer].n}.`, 'me');
+  S.unread = 0; // el informe ya lo cuenta
   ov().innerHTML = modal('El golpe', `
   <div class="file-no">${clock(0)} · ${esc(c.n)} · Informe reservado</div>
   <h1>${esc(cr.n)}</h1>

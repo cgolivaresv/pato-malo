@@ -16,6 +16,7 @@ import { playTravel, hideStamp } from './fx.js';
 import { I } from './icons.js';
 import { startTutorial, tutNext, endTutorial } from './tutorial.js';
 import { playFromTitle, skipTitleIntro } from './title.js';
+import { dismissDigest, renderDigest } from './digest.js';
 
 let surrenderArmed = false;
 
@@ -30,6 +31,7 @@ const ACTIONS = {
   zoomWorld: () => zoomWorld(),
   zoomIn: () => zoomBy(0.55),
   zoomOut: () => zoomBy(1.8),
+  digestOk: () => { dismissDigest(); render(); },
   toggleStats: () => { ui.statsOpen = !ui.statsOpen; render(); },
   // Pantalla de inicio
   titlePlay: () => playFromTitle(),
@@ -86,12 +88,18 @@ export function initEvents() {
 
   document.addEventListener('click', (e) => {
     if (e.target.closest('#stampLayer')) { hideStamp(); return; }
+    // Tocar fuera del parte lo da por leído; la próxima acción trae su propio parte
+    const dg = $('#digest');
+    let read = false;
+    if (!dg.hidden && !e.target.closest('#digest, #ov, #tut, #fx')) { dismissDigest(); read = true; }
+    else if (!dg.hidden && e.target.closest('#digest') && !e.target.closest('[data-act]')) { dismissDigest(); renderDigest(); return; }
     // Tocar la escena de inicio la salta (salvo los botones)
     if (e.target.closest('#title') && !e.target.closest('[data-act]')) { skipTitleIntro(); return; }
     const el = e.target.closest('[data-act]');
     if (el && !el.disabled) {
       const fn = ACTIONS[el.dataset.act];
       if (fn) fn(el.dataset.arg);
+      if (read) renderDigest();
       return;
     }
     // Tocar una ciudad en el mapa la elige como destino y abre "Moverse"
@@ -100,7 +108,7 @@ export function initEvents() {
       S.dest = city.dataset.id === S.cur ? '' : city.dataset.id;
       S.tab = 'move';
       render();
-    }
+    } else if (read) renderDigest();
   });
 
   // Buscador de destinos: solo redibuja la lista para no perder el foco
@@ -114,6 +122,7 @@ export function initEvents() {
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('#stampLayer').hidden) hideStamp();
+    else if (!$('#digest').hidden) { dismissDigest(); render(); }
     else if (S && S.tab !== 'act' && $('#ov').hidden) { S.tab = 'act'; render(); }
   });
 

@@ -16,7 +16,8 @@ Juego de escape en el navegador. Acabas de dar un golpe en una ciudad de Chile y
 ## Lo que lo hace distinto
 
 - **Plan de escape.** Tres salidas, cada una con un contacto escondido que hay que encontrar siguiendo rumores. Volar directo con tu documento real casi nunca funciona: migraciones te espera.
-- **Rastros con retraso.** Cada acción puede dejar una huella que la policía descubre horas después. Te enteras por las noticias.
+- **Rastros con retraso.** Cada acción puede dejar una huella que la policía descubre horas después.
+- **Parte de novedades.** Después de cada acción aparece un parte con todo lo nuevo (resultados, rumores, rastros descubiertos, movimientos de McCuack), con las alertas primero. Se cierra con «Entendido» o tocando cualquier otra cosa; el historial completo queda en Noticias.
 - **Persecución visible.** La brigada de McCuack siempre se ve en el mapa. Cada rastro abre una zona de búsqueda que crece con las horas, y McCuack instala controles en las ciudades cercanas. Si la brigada llega mientras duermes, te despiertan las sirenas.
 - **Eventos con decisiones.** Quince situaciones en viajes y ciudades (el taxista que te reconoce, un control carretero, la fonda, un temblor, un quiltro, la llamada de McCuack…), cada opción con su costo y riesgo a la vista.
 - **Calor.** Sube con cada rastro descubierto y hace más peligrosos los controles. Baja cuando te escondes.
@@ -70,6 +71,7 @@ src/
     components.js     Tarjetas de decisión (tiempo, costo y riesgo)
     icons.js          Iconos SVG
     screens.js        Elegir golpe, informe y resultado
+    digest.js         Parte de novedades después de cada acción
     events.js         Manejador único de clics (data-act / data-arg)
   assets/pato/        Ilustración y 8 expresiones del pato (WebP, fondo limpio)
   assets/detective/   Ilustración y 6 expresiones del detective McCuack

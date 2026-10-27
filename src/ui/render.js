@@ -14,6 +14,7 @@ import { heatOf } from '../game/heat.js';
 import { showEvent } from './screens.js';
 import { inZone, checkAt, zoneRadius } from '../game/pursuit.js';
 import { CONTACTS } from '../data/content.js';
+import { renderDigest } from './digest.js';
 
 // Estado solo de interfaz (no forma parte de la partida)
 export const ui = { statsOpen: false, q: '', filter: 'cerca', lastShown: 0, game: null };
@@ -43,6 +44,7 @@ export function render() {
   ui.lastShown = shown.length;
   // Un evento esperando decisión
   if (S.event && !S.over) showEvent();
+  renderDigest();
 }
 
 function renderIdle() {
@@ -52,6 +54,7 @@ function renderIdle() {
   $('#strip').innerHTML = `<div class="city"><div class="c-eyebrow">Sin golpe en curso</div><h2>Elige un golpe</h2></div><div class="act-row"><button class="btn" type="button" data-act="crimes">Ver golpes disponibles</button></div>`;
   $('#dock').innerHTML = '';
   $('#sheet').innerHTML = '';
+  renderDigest();
 }
 
 function renderStats() {
