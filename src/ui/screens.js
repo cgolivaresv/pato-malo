@@ -49,7 +49,10 @@ export function showCrimes() {
   ${S && !S.over ? '<div class="act-row"><button class="btn ghost" type="button" data-act="closeOv">Volver a la fuga</button></div>' : ''}`, 'start');
 }
 
+// Fuga que seguía en curso cuando se eligió un golpe nuevo: se recupera si el jugador vuelve atrás
+let prevGame = null;
 export function startGame(id) {
+  prevGame = S && !S.over ? S : null;
   setS(newGame(id));
   const cr = crime(), c = me();
   news(0, `Golpe consumado en ${c.n}: ${cr.loot}. Tienes ${cr.alarm} h antes de que suene la alarma.`, 'me');
@@ -65,7 +68,7 @@ export function startGame(id) {
   <p class="hint">Para salir del continente arma tu plan en la hoja <b>Escape</b>: busca al capitán, al piloto o al falsificador maestro.</p>
   <dl class="facts"><dt>${I.house}Casas seguras</dt><dd>${S.safe.map((i) => esc(CITY[i].n)).join(', ')}</dd>${S.buyer ? `<dt>${I.pin}Comprador</dt><dd>${esc(CITY[S.buyer].n)}</dd>` : ''}<dt>${I.globe}Interpol</dt><dd>en ${cr.interpol} h</dd><dt>${S.season === 'invierno' ? I.snow : I.sun}Estación</dt><dd>${S.season === 'invierno' ? 'Invierno: la nieve cierra los pasos a Argentina en el centro y sur' : 'Verano: los pasos cordilleranos están abiertos'}</dd></dl>
   <div class="det-bubble"><p><b>McCuack</b> ${esc(detQuip('inicio'))}</p><img class="det-face" src="${detFace('serio')}" alt="" width="56" height="56"></div>
-  <div class="act-row"><button class="btn big" type="button" data-act="begin">Empezar la fuga</button></div>`, 'brief');
+  <div class="act-row"><button class="btn big" type="button" data-act="begin">Empezar la fuga</button><button class="btn ghost" type="button" data-act="backCrimes">Elegir otro golpe</button></div>`, 'brief');
   render();
 }
 
@@ -84,7 +87,15 @@ export function showEnd() {
   <div class="act-row"><button class="btn big" type="button" data-act="crimes">Otro golpe</button><button class="btn ghost" type="button" data-act="viewMap">Ver el recorrido</button></div>`, o.win ? 'end win' : 'end lose');
 }
 
-export function begin() { closeOv(); render(); zoomMe(); setTimeout(maybeTutorial, 700); }
+// Desde el informe: descarta este golpe y vuelve a la lista
+export function backToCrimes() {
+  setS(prevGame);
+  prevGame = null;
+  render();
+  showCrimes();
+}
+
+export function begin() { prevGame = null; closeOv(); render(); zoomMe(); setTimeout(maybeTutorial, 700); }
 
 // Ventana de evento: situación, opciones con su costo y riesgo, y luego el resultado
 export function showEvent() {

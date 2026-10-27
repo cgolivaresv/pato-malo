@@ -10,7 +10,7 @@ import { sellLot, sellItem, acceptJob, robbery, borrow, repay } from '../game/mo
 import { finish } from '../game/engine.js';
 import { render, toast, ui } from './render.js';
 import { destList } from './sheets.js';
-import { showCrimes, startGame, closeOv, begin } from './screens.js';
+import { showCrimes, startGame, closeOv, begin, backToCrimes } from './screens.js';
 import { zoomMe, zoomWorld, zoomBy } from './map.js';
 import { playTravel, hideStamp } from './fx.js';
 import { I } from './icons.js';
@@ -23,7 +23,7 @@ import { unlock, sfx, cycleSound, soundMode } from '../audio/sound.js';
 const SOUND_OF = {
   sheet: (a) => (S && S.tab === a ? 'close' : 'open'), closeSheet: 'close', closeOv: 'close', digestOk: 'close',
   rest: 'rest', lowProfile: 'rest', disguise: 'swish', soplon: 'ask', ask: 'ask',
-  forgeCheap: 'paper', forgeTop: 'paper', start: 'paper', crimes: 'paper',
+  forgeCheap: 'paper', forgeTop: 'paper', start: 'paper', crimes: 'paper', backCrimes: 'close',
   sellFence: 'cash', sellLot: 'cash', sellItem: 'cash', acceptJob: 'cash', robbery: 'cash', borrow: 'cash', repay: 'cash', hire: 'cash',
   leave: (k) => (k === 'captain' ? 'ship' : 'air'), begin: 'siren', eventChoice: 'resolve', surrender: 'deny',
   travel: null, sound: null, titleSkip: null,
@@ -41,6 +41,7 @@ const ACTIONS = {
   crimes: () => showCrimes(),
   start: (id) => startGame(id),
   begin: () => begin(),
+  backCrimes: () => backToCrimes(),
   closeOv: () => closeOv(),
   viewMap: () => { closeOv(); if (S) { S.tab = 'act'; render(); } zoomMe(); },
   zoomMe: () => zoomMe(),
