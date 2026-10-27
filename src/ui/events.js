@@ -2,7 +2,10 @@
 // Cada botón declara data-act="<acción>" y, si hace falta, data-arg="<argumento>".
 import { $ } from '../lib/util.js';
 import { S } from '../game/state.js';
-import { rest, lowProfile, disguise, soplon, forge, searchFence, sell, travel } from '../game/actions.js';
+import { rest, lowProfile, disguise, soplon, travel } from '../game/actions.js';
+import { askAround, forgeCheap, forgeTop, sellFence, hireExit, leave } from '../game/plan.js';
+import { resolveEvent, closeEvent } from '../game/events.js';
+import { after } from '../game/engine.js';
 import { sellLot, sellItem, acceptJob, robbery, borrow, repay } from '../game/money.js';
 import { finish } from '../game/engine.js';
 import { render, toast, ui } from './render.js';
@@ -45,9 +48,17 @@ const ACTIONS = {
   lowProfile: () => lowProfile(),
   disguise: () => disguise(),
   soplon: () => soplon(),
-  forge: () => forge(),
-  searchFence: () => searchFence(),
-  sell: () => sell(),
+  // Plan de escape
+  ask: (k) => askAround(k),
+  forgeCheap: () => forgeCheap(),
+  forgeTop: () => forgeTop(),
+  sellFence: () => sellFence(),
+  hire: (k) => hireExit(k),
+  leave: (k) => leave(k),
+  goto: (id) => { S.dest = id; S.tab = 'move'; render(); zoomMe(); },
+  // Eventos
+  eventChoice: (i) => { resolveEvent(Number(i)); if (S.over) return; render(); },
+  eventClose: () => { closeEvent(); closeOv(); after(); },
   // Dinero
   sellLot: () => sellLot(),
   sellItem: (i) => sellItem(Number(i)),

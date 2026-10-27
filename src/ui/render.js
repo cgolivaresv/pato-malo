@@ -11,6 +11,9 @@ import { shortMoney } from './components.js';
 import { SHEETS, SECTIONS, renderSheet } from './sheets.js';
 import { playStamp } from './fx.js';
 import { heatOf } from '../game/heat.js';
+import { showEvent } from './screens.js';
+import { inZone, checkAt, zoneRadius } from '../game/pursuit.js';
+import { CONTACTS } from '../data/content.js';
 
 // Estado solo de interfaz (no forma parte de la partida)
 export const ui = { statsOpen: false, q: '', filter: 'cerca', lastShown: 0, game: null };
@@ -38,6 +41,8 @@ export function render() {
   const shown = S.traces.filter((t) => t.shown);
   if (shown.length > ui.lastShown && !S.over) playStamp('ubicado', CITY[shown[shown.length - 1].city].n);
   ui.lastShown = shown.length;
+  // Un evento esperando decisión
+  if (S.event && !S.over) showEvent();
 }
 
 function renderIdle() {
@@ -73,12 +78,15 @@ function heatTable() {
 
 // El aviso más urgente, si lo hay
 function renderBanner() {
-  const b = $('#banner'), c = me();
+  const b = $('#banner'), c = me(), po = S.police;
   let msg = '', kind = 'red';
   if (S.over) msg = '';
-  else if (policeHere() && S.hours < S.soplonUntil) msg = `La brigada de McCuack está en ${c.n}. Cada hora aquí es un riesgo.`;
+  else if (policeHere()) msg = `La brigada de McCuack está en ${c.n}. Cada hora aquí es un riesgo: muévete o escóndete bien.`;
+  else if (po.arrive != null && po.target === c.id) msg = `La brigada de McCuack viene a ${c.n}: llega en ${Math.max(1, Math.round(po.arrive - S.hours))} h.`;
+  else if (checkAt(c.id)) msg = `Control de McCuack en ${c.n}: revisan documentos en cada bus y vuelo que entra o sale.`;
   else if (S.heat >= 70) msg = `Calor ${Math.round(S.heat)}: tu cara está en todas partes. Escóndete.`;
-  else if ((S.alert[c.c] || -1) > S.hours) msg = `Alerta en ${COUNTRIES[c.c].n}: controles reforzados por ${Math.ceil(S.alert[c.c] - S.hours)} h.`;
+  else if (inZone(c)) { msg = `Estás dentro de la zona de búsqueda de McCuack (${Math.round(zoneRadius())} km alrededor de ${CITY[S.zone.city].n}).`; kind = 'amber'; }
+  else if ((S.alert[c.c] || -1) > S.hours) { msg = `Alerta en ${COUNTRIES[c.c].n}: controles reforzados por ${Math.ceil(S.alert[c.c] - S.hours)} h.`; kind = 'amber'; }
   else if (S.job && S.job.deadline - S.hours < 8) { msg = `Encargo: llega a ${CITY[S.job.to].n} antes de ${clock(S.job.deadline)} o la banda te delata.`; kind = 'amber'; }
   else if (S.loan && S.loan.due - S.hours < 16) { msg = `El usurero espera ${money(S.loan.owe)} antes de ${clock(S.loan.due)}.`; kind = 'amber'; }
   else if (S.awake >= 16) { msg = `Llevas ${Math.round(S.awake)} h despierto. A las 20 te duermes donde estés.`; kind = 'amber'; }
@@ -92,6 +100,9 @@ function renderStrip() {
   const tags = [];
   if (S.safe.includes(c.id)) tags.push(`<span class="tag safe">${I.house}Casa segura</span>`);
   if (S.fenceKnown.includes(c.id)) tags.push(`<span class="tag amber">${I.coins}Reducidor</span>`);
+  for (const k of Object.keys(CONTACTS)) if (S.contacts[k].found && S.contacts[k].city === c.id) tags.push(`<span class="tag amber">${I[CONTACTS[k].icon]}${CONTACTS[k].n}</span>`);
+  if (checkAt(c.id)) tags.push(`<span class="tag hot">${I.shield}Control de McCuack</span>`);
+  if (inZone(c)) tags.push(`<span class="tag hot">${I.target}Zona de búsqueda</span>`);
   if (HUB.has(c.id)) tags.push(`<span class="tag">${I.plane}Vuelos internacionales</span>`);
   if (disguised()) tags.push(`<span class="tag">${I.mask}Disfrazado</span>`);
   if (S.season === 'invierno' && ['CL', 'AR'].includes(c.c)) tags.push(`<span class="tag cold">${I.snow}Invierno</span>`);

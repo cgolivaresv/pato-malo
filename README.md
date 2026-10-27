@@ -7,15 +7,18 @@ Juego de escape en el navegador. Acabas de dar un golpe en una ciudad de Chile y
 ## Cómo se juega
 
 1. Elige un golpe: camión de valores, joyería u óleo colonial. Cada uno tiene un objetivo distinto.
-2. Muévete por el mapa en bus, avión o paso clandestino.
-3. Escóndete, cambia de aspecto, compra un pasaporte falso o paga a un soplón.
-4. Consigue dinero vendiendo tus cosas o parte del botín, haciendo encargos para bandas, asaltando o pidiendo al usurero.
-5. Gana saliendo del continente y pasando migraciones.
+2. Arma un **plan de escape**: pregunta en el bajo mundo por un capitán de carguero, un piloto de avioneta o un falsificador maestro. Los rumores pueden ser falsos; los que se repiten suelen ser ciertos.
+3. Muévete por el mapa en bus, avión, paso clandestino o barco, esquivando los controles y la zona de búsqueda de McCuack.
+4. Escóndete, cambia de aspecto, compra un pasaporte barato para moverte o paga a un soplón.
+5. Consigue dinero vendiendo tus cosas o parte del botín, haciendo encargos para bandas, asaltando o pidiendo al usurero.
+6. Sal del continente: en el carguero, en la avioneta o en un vuelo comercial con el pasaporte de calidad.
 
 ## Lo que lo hace distinto
 
+- **Plan de escape.** Tres salidas, cada una con un contacto escondido que hay que encontrar siguiendo rumores. Volar directo con tu documento real casi nunca funciona: migraciones te espera.
 - **Rastros con retraso.** Cada acción puede dejar una huella que la policía descubre horas después. Te enteras por las noticias.
-- **Una policía que razona.** La brigada viaja al último lugar donde supo de ti. Si pierde el rastro, vigila el aeropuerto internacional más cercano.
+- **Persecución visible.** La brigada de McCuack siempre se ve en el mapa. Cada rastro abre una zona de búsqueda que crece con las horas, y McCuack instala controles en las ciudades cercanas. Si la brigada llega mientras duermes, te despiertan las sirenas.
+- **Eventos con decisiones.** Quince situaciones en viajes y ciudades (el taxista que te reconoce, un control carretero, la fonda, un temblor, un quiltro, la llamada de McCuack…), cada opción con su costo y riesgo a la vista.
 - **Calor.** Sube con cada rastro descubierto y hace más peligrosos los controles. Baja cuando te escondes.
 - **Interpol.** Después de un plazo, tu documento real es casi una sentencia.
 - **Recompensas diarias.** Cada 24 horas sin ser atrapado ganas dinero u objetos útiles.
@@ -35,7 +38,7 @@ npm run build    # genera la versión publicable en dist/
 
 Cada vez que se sube un cambio a `main`, GitHub Actions compila el juego y lo publica en GitHub Pages.
 
-Para medir el balance, con `npm run dev` abre `/pato-malo/sim/` y ejecuta `runSim(120)` en la consola: juega fugas automáticas con varias estrategias y muestra cuánto gana cada una. El simulador no se publica.
+Para medir el balance, con `npm run dev` abre `/pato-malo/sim/` y ejecuta `runSim(120)` en la consola: juega fugas automáticas con varias estrategias y muestra cuánto gana cada una. El simulador no se publica. Con la versión 0.8.0, volar directo gana entre 3 y 11% de las veces, el pasaporte barato entre 4 y 21%, y los planes completos del simulador entre 21 y 53% (una persona jugando con cuidado debería ganar más).
 
 ## Estructura
 
@@ -57,10 +60,13 @@ src/
     actions.js        Esconderse, bajo mundo, viajar
     money.js          Formas de conseguir dinero
     heat.js           Calor por país
+    plan.js           Plan de escape: rumores, contactos y salidas
+    pursuit.js        Zona de búsqueda, controles y riesgo de redada
+    events.js         Eventos con decisiones
   ui/                 Interfaz
     map.js            Mapa de fuga: capas, etiquetas y gestos (arrastrar, pellizcar, rueda)
     render.js         Barra de estado, aviso de peligro, franja de ciudad y barra de acciones
-    sheets.js         Hojas: Esconderse, Moverse, Plata, Bajo mundo y Noticias
+    sheets.js         Hojas: Esconderse, Moverse, Plata, Escape y Noticias
     components.js     Tarjetas de decisión (tiempo, costo y riesgo)
     icons.js          Iconos SVG
     screens.js        Elegir golpe, informe y resultado

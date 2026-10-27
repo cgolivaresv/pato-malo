@@ -46,3 +46,28 @@ export const REWARDS = [
   { k: 'safe', n: 'Nueva casa segura', d: 'Un viejo conocido te ofrece su casa.' },
   { k: 'soplon', n: 'Número directo del soplón', d: 'Tu próxima consulta al soplón es gratis.' },
 ];
+
+// Precio que paga un reducidor por las joyas, como fracción de su valor
+export const FENCE_RATE = 0.015;
+
+// Contactos para salir del continente. Cada partida esconde a cada uno en una de sus ciudades posibles.
+export const CONTACTS = {
+  forger: {
+    n: 'Falsificador maestro', short: 'el falsificador', icon: 'id',
+    cities: ['lima', 'buenosaires', 'lapaz', 'bogota', 'asuncion', 'cordoba', 'montevideo', 'santacruz', 'arequipa', 'rosario'],
+    price: 1200000, hours: 8,
+    exit: 'Vuelo comercial', exitDesc: 'Con su pasaporte de calidad, migraciones casi no te mira. Vuelas desde un aeropuerto internacional.',
+  },
+  captain: {
+    n: 'Capitán de carguero', short: 'el capitán', icon: 'ship',
+    cities: ['valparaiso', 'antofagasta', 'buenosaires', 'montevideo', 'lima', 'arica', 'iquique', 'concepcion', 'puertomontt'],
+    price: 2000000,
+    exit: 'Carguero', exitDesc: 'Viajas escondido entre contenedores. No hay migraciones, pero el barco zarpa solo dos días a la semana.',
+  },
+  pilot: {
+    n: 'Piloto de avioneta', short: 'el piloto', icon: 'plane',
+    cities: ['calama', 'sanpedro', 'uyuni', 'salta', 'santacruz', 'coyhaique', 'natales', 'copiapo', 'neuquen', 'cochabamba'],
+    price: 1500000,
+    exit: 'Avioneta', exitDesc: 'Despega de una pista de tierra a las 03:00. Rápida y sin controles, pero un control policial en la ciudad lo arruina.',
+  },
+};

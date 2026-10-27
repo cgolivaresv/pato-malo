@@ -5,6 +5,7 @@ import { R, pick, dist, money, store } from '../lib/util.js';
 import { S, crime, me, disguised, interpol, policeHere } from './state.js';
 import { offerFor } from './money.js';
 import { spreadHeat, decayAbroad, interpolHeat } from './heat.js';
+import { setZone, placeChecks, raidRate } from './pursuit.js';
 import { rest } from './actions.js';
 import { render, toast } from '../ui/render.js';
 import { showEnd } from '../ui/screens.js';
@@ -22,9 +23,11 @@ export function pay(m) {
 
 // Avanza el reloj en pasos de 15 minutos.
 // ctx.where: 'city' | 'transit' · ctx.rate: probabilidad por hora de redada si la policía está en tu ciudad
+// Devuelve 'interrupted' si la brigada llegó a tu ciudad y te despertaste con las sirenas.
 export function advance(h, ctx) {
   const dt = 0.25;
   let left = h;
+  const copsBefore = policeHere();
   while (left > 1e-9 && !S.over) {
     const step = Math.min(dt, left);
     left -= step;
@@ -39,6 +42,10 @@ export function advance(h, ctx) {
         S.police.known = t.city;
         S.police.target = t.city;
         news(t.at, t.txt, 'alert');
+        // La zona de búsqueda se recentra en el rastro y McCuack cierra las salidas cercanas
+        setZone(t.city);
+        const fresh = placeChecks(t.city);
+        if (fresh.length) news(S.hours, `McCuack instala controles en ${fresh.map((id) => CITY[id].n).join(' y ')} por ${36} h.`, 'police');
       }
     }
     if (!S.interpolShown && interpol()) {
@@ -47,6 +54,13 @@ export function advance(h, ctx) {
       news(S.hours, 'Interpol emite una notificación roja con tu nombre. Los controles con tu documento real serán mucho más estrictos.', 'alert');
     }
     policeTick(step);
+    // La brigada llegó a tu ciudad mientras dormías o esperabas: te despiertan las sirenas
+    if (ctx.where === 'city' && !copsBefore && policeHere() && left > 0.5) {
+      news(S.hours, `¡Sirenas! La brigada de McCuack llegó a ${me().n}. Te despertaste a tiempo.`, 'alert');
+      toast(`¡La brigada llegó a ${me().n}!`);
+      S.awake = Math.max(0, S.awake - (h - left) * 0.5);
+      return 'interrupted';
+    }
     if (S.job && S.hours > S.job.deadline) {
       const j = S.job, where = ctx.where === 'city' ? S.cur : j.to;
       S.job = null;
@@ -59,9 +73,10 @@ export function advance(h, ctx) {
       addTrace(S.cur, 1, `Un prestamista entrega a la PDI la ubicación del prófugo en ${me().n}.`);
     }
     if (Math.floor(S.hours / 24) > S.days) { S.days = Math.floor(S.hours / 24); giveReward(); }
-    if (ctx.where === 'city' && policeHere()) {
-      const rate = ctx.rate * (1 + S.heat / 80) * (disguised() ? 0.6 : 1);
-      if (R() < rate * step) { caught(ctx.raidMsg || `La PDI irrumpió en ${ctx.place || 'tu escondite'} de ${me().n}.`); return; }
+    // Redadas: la brigada en tu ciudad es el mayor peligro; la zona de búsqueda y los controles suman algo
+    if (ctx.where === 'city') {
+      const rate = raidRate(ctx.rate || 0.04, ctx.safe);
+      if (rate && R() < rate * step) { caught(ctx.raidMsg || `La PDI irrumpió en ${ctx.place || 'tu escondite'} de ${me().n}.`); return; }
     }
   }
 }
@@ -70,19 +85,21 @@ export function advance(h, ctx) {
 function policeTick(step) {
   const po = S.police;
   if (S.hours < crime().alarm) return;
+  // La brigada tarda 3 horas en llegar a la ciudad del golpe: es tu ventana para salir
+  if (po.city == null && S.hours < crime().alarm + 3) return;
   if (po.city == null) {
     po.city = S.start; po.arrive = null;
     news(S.hours, `Un equipo de la Brigada de Robos llega a ${CITY[S.start].n}.`, 'police');
   }
   if (po.arrive != null && S.hours >= po.arrive) {
     po.city = po.target; po.arrive = null; po.idle = 0;
-    if (S.hours < S.soplonUntil) news(S.hours, `Soplón: la brigada aterrizó en ${CITY[po.city].n}.`, 'police');
+    news(S.hours, `La brigada de McCuack llegó a ${CITY[po.city].n}.`, 'police');
   }
   if (po.arrive == null) {
     if (po.target && po.target !== po.city) {
       const d = dist(CITY[po.city], CITY[po.target]);
-      po.arrive = S.hours + 1.5 + d / 800;
-      if (S.hours < S.soplonUntil) news(S.hours, `Soplón: la brigada viaja a ${CITY[po.target].n}.`, 'police');
+      po.arrive = S.hours + 2.5 + d / 700;
+      news(S.hours, `La brigada de McCuack viaja a ${CITY[po.target].n}.`, 'police');
       return;
     }
     po.idle += step;
@@ -130,9 +147,12 @@ function canAfford() {
 // Se llama al terminar cada acción
 export function after() {
   if (S.over) return;
-  fatigue();
-  if (S.over) return;
-  if (S.cash < 25000 && !canAfford()) finish(false, 'Te quedaste sin dinero. Sin plata para moverte ni esconderte, te entregaste a la policía.');
+  // Con un evento esperando decisión, el cansancio y la plata se revisan después de decidir
+  if (!S.event) {
+    fatigue();
+    if (S.over) return;
+    if (S.cash < 25000 && !canAfford()) { finish(false, 'Te quedaste sin dinero. Sin plata para moverte ni esconderte, te entregaste a la policía.'); return; }
+  }
   render();
   zoomMe();
 }

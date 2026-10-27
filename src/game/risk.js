@@ -2,23 +2,50 @@
 import { CITY, HUB, BORDER, inSA } from '../data/geo.js';
 import { clamp01, dist } from '../lib/util.js';
 import { S, disguised, interpol } from './state.js';
+import { checkAt, inZone, zoneDensity } from './pursuit.js';
+
+const fakeOk = () => S.id === 'fake' && !S.idBurnSecret;
+// Escala general de los controles en viajes (balance)
+export const CONTROL_SCALE = 0.6;
 
 // Probabilidad de que te detengan en un control de identidad
 export function idRisk(kind, from, to) {
   const intl = from.c !== to.c, alertC = (S.alert[from.c] || -1) > S.hours;
   let p = 0;
-  if (S.id === 'fake' && !S.idBurnSecret) {
+  if (fakeOk()) {
     p = (intl ? 0.045 : 0.025) + S.heat / 750;
+    if (S.passQ === 'top') p *= 0.5;
     if (interpol()) p *= 1.4;
   } else {
-    p = (intl ? 0.17 : 0.06) + S.heat / (intl ? 220 : 400);
+    p = (intl ? 0.17 : 0.04) + S.heat / (intl ? 220 : 400);
     if (interpol()) p = p * 2.4 + 0.08;
   }
-  if (kind === 'bus' && !intl) p = S.heat / 2000;
-  if (alertC) p += 0.07;
-  if (S.police.city === from.id && S.police.arrive == null) p += 0.18;
+  // Bus dentro del país: no piden documento; solo hay cámaras y alguna patrulla
+  const domBus = kind === 'bus' && !intl;
+  if (domBus) p = S.heat / 2000;
+  // Alerta en el país: revisan más, sobre todo a quien viaja con su documento real
+  if (alertC) p += domBus ? 0.015 : fakeOk() ? 0.025 : 0.07;
+  // La brigada en tu ciudad vigila sobre todo el aeropuerto
+  if (S.police.city === from.id && S.police.arrive == null) p += domBus ? 0.08 : 0.18;
+  // Controles de McCuack en la ciudad de salida o de llegada: revisan documentos a todos
+  if (kind !== 'paso' && (checkAt(from.id) || checkAt(to.id))) p += fakeOk() ? (S.passQ === 'top' ? 0.015 : 0.04) : 0.12;
+  // Dentro de la zona de búsqueda hay más patrullas
+  if (kind !== 'paso' && inZone(from)) p += (domBus ? 0.02 : 0.05) * zoneDensity();
   if (disguised()) p *= 0.6;
+  if (S.perks.quiltro) p *= 0.85;
   if (S.perks.press && kind !== 'paso') p *= 0.5;
+  if (S.hours < S.perks.chaosUntil) p *= 0.3;
+  return clamp01(p * CONTROL_SCALE);
+}
+
+// Migraciones al aterrizar fuera de Sudamérica: depende del documento con que viajas
+export function exitRisk() {
+  const real = S.id === 'real' || S.idBurnSecret;
+  let p;
+  if (real) p = 0.75 + S.heat / 200 + (interpol() ? 0.15 : 0);
+  else if (S.passQ === 'top') p = 0.04 + S.heat / 500 + (interpol() ? 0.04 : 0);
+  else p = 0.6 + S.heat / 200 + (interpol() ? 0.12 : 0);
+  if (disguised()) p *= 0.8;
   return clamp01(p);
 }
 
@@ -65,6 +92,8 @@ export function modes(fromId, toId) {
   // Avión
   const air = { k: 'air', n: 'Avión', h: 2.5 + d / 800 + (d > 4000 ? 3 : 0) + (intl ? 1 : 0), m: (50000 + d * 58) * (intl ? 1.2 : 1), p: idRisk('air', from, to), id: true, info: [] };
   if (S.season === 'invierno' && (farSouth(from) || farSouth(to)) && inSA(from) && inSA(to)) { air.h += 2; air.info.push('Invierno: el viento austral atrasa los vuelos (+2 h).'); }
+  if (checkAt(fromId) || checkAt(toId)) air.info.push(`Control de McCuack en ${checkAt(fromId) ? from.n : to.n}: revisan documentos con lupa.`);
+  if (inSA(from) && !inSA(to)) air.exit = exitRisk();
   out.push(air);
 
   // Bus
@@ -84,6 +113,11 @@ export function modes(fromId, toId) {
       bus.info.push(`Incluye la barcaza de la Carretera Austral, que sale a las 08:00${w >= 1 ? ` (esperas ${Math.round(w)} h)` : ''}.`);
     }
     if (chacao(from, to)) { bus.h += 1; bus.info.push('Cruzas el canal de Chacao en transbordador.'); }
+    if (checkAt(fromId) || checkAt(toId)) {
+      bus.id = true;
+      bus.info.push(`Control de McCuack en ${checkAt(fromId) ? from.n : to.n}: piden documento a todos los pasajeros.`);
+      bus.trace = bus.trace || `Un control de la PDI registra tu documento en el bus a ${to.n}.`;
+    }
     if (ruta5(from, to)) {
       bus.id = true;
       bus.p = idRisk('air', from, to);

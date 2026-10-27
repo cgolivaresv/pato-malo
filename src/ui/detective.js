@@ -47,7 +47,7 @@ export function detQuip(mood) {
 // soplón activo o la brigada en tu ciudad
 export function detVisible() {
   if (!S || S.over) return false;
-  return freshTrace() || S.hours < S.soplonUntil || (policeHere() && S.hours < S.soplonUntil);
+  return freshTrace() || S.hours < S.soplonUntil || policeHere();
 }
 
 export function detBubble(mood = detMood()) {

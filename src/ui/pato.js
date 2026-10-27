@@ -31,7 +31,7 @@ export function moodOf() {
   const alert = (S.alert[CITY[S.cur].c] || -1) > S.hours;
   // Un rastro descubierto en las últimas 2 horas también lo asusta
   const freshTrace = S.traces.some((t) => t.shown && S.hours - t.at < 2);
-  if (policeHere() && S.hours < S.soplonUntil) return 'policia';
+  if (policeHere()) return 'policia';
   if (freshTrace) return 'noticia';
   if (S.heat >= 70) return 'enojado';
   if (alert && S.heat >= 45) return 'alerta';

@@ -6,6 +6,8 @@ import { CITIES, CITY, COUNTRIES, CONO, BIG, HUB, inSA } from '../data/geo.js';
 import { $, esc } from '../lib/util.js';
 import { S, me } from '../game/state.js';
 import { heatOf } from '../game/heat.js';
+import { zoneRadius, activeChecks } from '../game/pursuit.js';
+import { CONTACTS } from '../data/content.js';
 import { face, moodOf } from './pato.js';
 import { detFace } from './detective.js';
 
@@ -115,6 +117,12 @@ export function drawOverlay() {
   const block = (x, y, r) => obstacles.push({ x0: x - r, x1: x + r, y0: y - r, y1: y + r });
   const label = (x, y, text, o) => labels.push({ x, y, text, ...o });
 
+  // Zona de búsqueda: círculo alrededor del último rastro (radio en km a esa latitud)
+  if (S && S.zone && !S.over) {
+    const c = CITY[S.zone.city], [x, y] = P(c);
+    const r = (zoneRadius() / (6371 * Math.cos((c.la * Math.PI) / 180))) * MAP.s;
+    lines += `<circle class="zone" cx="${x}" cy="${y}" r="${r}" stroke-width="${px(1.5)}" stroke-dasharray="${px(6)} ${px(5)}"/>`;
+  }
   // Recorrido del pato y ruta al destino elegido
   if (S) {
     for (let i = 1; i < S.path.length; i++) lines += `<path d="${arc(CITY[S.path[i - 1]], CITY[S.path[i]]).d}" class="trail" stroke-width="${px(2.4)}" stroke-dasharray="${px(6)} ${px(5)}"/>`;
@@ -130,7 +138,7 @@ export function drawOverlay() {
       }
     }
     const po = S.police;
-    if (po.city && (S.hours < S.soplonUntil || S.over) && po.arrive != null && po.target) {
+    if (po.city && po.arrive != null && po.target) {
       lines += `<path d="${arc(CITY[po.city], CITY[po.target]).d}" class="cop-route" stroke-width="${px(1.8)}" stroke-dasharray="${px(4)} ${px(4)}"/>`;
     }
   }
@@ -164,8 +172,32 @@ export function drawOverlay() {
       const [x, y] = P(CITY[t.city]), s = px(5);
       marks += `<path class="trace" d="M${x - s} ${y - s}L${x + s} ${y + s}M${x + s} ${y - s}L${x - s} ${y + s}" stroke-width="${px(2.6)}"/>`;
     }
+    // Controles de McCuack: barrera a rayas
+    for (const k of activeChecks()) {
+      const [x, y] = P(CITY[k.city]), w = px(11), hh = px(4.2);
+      marks += `<g class="chk"><rect x="${x - w}" y="${y - px(12)}" width="${2 * w}" height="${hh}" rx="${px(1)}"/><line x1="${x - w * 0.6}" y1="${y - px(12)}" x2="${x - w * 0.6}" y2="${y - px(5)}" stroke-width="${px(1.4)}"/><line x1="${x + w * 0.6}" y1="${y - px(12)}" x2="${x + w * 0.6}" y2="${y - px(5)}" stroke-width="${px(1.4)}"/></g>`;
+      label(x, y - px(18), 'Control', { size: 10.5, pri: 80, cls: 'l-chk', gap: 0, center: true });
+    }
+    // Contactos encontrados
+    const CN = { forger: 'Falsificador', captain: 'Capitán', pilot: 'Piloto' };
+    for (const k of Object.keys(CONTACTS)) {
+      const ct = S.contacts[k];
+      if (!ct.found) continue;
+      const [x, y] = P(CITY[ct.city]);
+      marks += `<circle class="contact" cx="${x}" cy="${y}" r="${px(7.5)}" stroke-width="${px(2)}"/>`;
+      label(x, y + px(16), CN[k], { size: 10.5, pri: 87, cls: 'l-amber', gap: 0, center: true, force: true });
+    }
+    // Con el soplón: rastros que la PDI está por descubrir
+    if (S.hours < S.soplonUntil && !S.over) {
+      for (const t of S.traces) {
+        if (t.shown) continue;
+        const [x, y] = P(CITY[t.city]), s2 = px(4.5);
+        marks += `<path class="trace pending" d="M${x - s2} ${y - s2}L${x + s2} ${y + s2}M${x + s2} ${y - s2}L${x - s2} ${y + s2}" stroke-width="${px(2.2)}"/>`;
+        label(x, y + px(14), `en ${Math.max(1, Math.round(t.at - S.hours))} h`, { size: 10, pri: 64, cls: 'l-pend', gap: 0, center: true });
+      }
+    }
     const po = S.police;
-    if (po.city && (S.hours < S.soplonUntil || S.over)) {
+    if (po.city) {
       let [x, y] = P(CITY[po.city]);
       const pr = px(11);
       if (po.city === S.cur) { x -= px(26); y -= px(18); }

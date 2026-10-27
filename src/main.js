@@ -15,3 +15,14 @@ render();
 zoomStart();
 // Pantalla de inicio; al tocar Jugar se abre la elección del golpe
 showTitle(showCrimes);
+
+// Solo en desarrollo: acceso al estado para pruebas automáticas
+if (import.meta.env.DEV) {
+  Promise.all([import('./game/state.js'), import('./game/events.js'), import('./ui/render.js')]).then(([st, ev, ui]) => {
+    window.__dev = {
+      S: () => st.S,
+      // Fuerza un evento por id para revisarlo en pantalla
+      event: (id) => { const e = ev.EVENTS.find((x) => x.id === id); st.S.event = { id, ctx: { kind: 'city' }, vals: e.vals ? e.vals({ kind: 'city' }) : {}, result: null }; st.S.evCount++; ui.render(); },
+    };
+  });
+}
