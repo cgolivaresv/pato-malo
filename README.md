@@ -25,7 +25,7 @@ Juego de escape en el navegador. Acabas de dar un golpe en una ciudad de Chile y
 - **Recompensas diarias.** Cada 24 horas sin ser atrapado ganas dinero u objetos útiles.
 - **Calor por país.** Cada país tiene su propio calor. La noticia sale donde te descubren y se filtra un poco a los vecinos; al cruzar una frontera llegas con el calor de ese país.
 - **Geografía real.** Invierno o verano: en invierno la nieve cierra los pasos entre Chile y Argentina en el centro y sur. Transbordador de Chacao a Chiloé, barcaza de la Carretera Austral a Coyhaique (08:00), bus a Magallanes por Argentina, barco semanal Puerto Montt–Puerto Natales y controles aduaneros de la Ruta 5 en el Norte Grande.
-- **Tutorial.** Pato Malo guía la primera fuga; se repite con el botón «?».
+- **Tutorial.** Pato Malo guía la primera fuga; se puede repetir desde la pantalla de inicio o con el botón «?».
 
 ## Desarrollo
 

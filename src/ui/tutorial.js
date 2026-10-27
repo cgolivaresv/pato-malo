@@ -37,7 +37,10 @@ export function startTutorial() {
   addEventListener('resize', place);
 }
 
-export function maybeTutorial() { if (!store(KEY)) startTutorial(); }
+// Pedido desde la pantalla de inicio: se muestra al empezar la próxima fuga aunque ya se haya visto
+let forced = false;
+export function wantTutorial() { forced = true; }
+export function maybeTutorial() { if (forced || !store(KEY)) { forced = false; startTutorial(); } }
 
 export function tutNext() { step++; if (step >= STEPS.length) endTutorial(); else show(); }
 export function endTutorial() {

@@ -593,6 +593,8 @@ a { color: var(--sodium); }
 .ti-play { font-size: 30px !important; padding: 14px 64px !important; border-radius: 14px; box-shadow: 0 10px 30px #ff9a3c55, 0 0 0 4px #0b0910, 0 0 0 6px #ff9a3c66; animation: playPulse 2s ease-in-out 1.4s infinite; }
 @keyframes playPulse { 50% { box-shadow: 0 10px 40px #ff9a3c99, 0 0 0 4px #0b0910, 0 0 0 9px #ff9a3c44; } }
 .ti-rec { margin: 0; font-size: 13.5px; color: #e8deea; text-shadow: 0 2px 6px #000; text-align: center; }
+.ti-tut { background: #14111ad9 !important; font-size: 15px; padding: 9px 18px; border-radius: 999px; }
+.ti-tut b { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--siren); color: #0b0910; font-family: var(--f-display); font-size: 15px; }
 .ti-vs { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 8px; background: #14111ad9; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px 4px 4px; }
 .ti-vs img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; object-position: top; }
 .ti-vs img:first-child { border: 2px solid var(--sodium); background: var(--paper-2); }

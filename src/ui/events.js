@@ -14,7 +14,7 @@ import { showCrimes, startGame, closeOv, begin } from './screens.js';
 import { zoomMe, zoomWorld, zoomBy } from './map.js';
 import { playTravel, hideStamp } from './fx.js';
 import { I } from './icons.js';
-import { startTutorial, tutNext, endTutorial } from './tutorial.js';
+import { startTutorial, tutNext, endTutorial, wantTutorial } from './tutorial.js';
 import { playFromTitle, skipTitleIntro } from './title.js';
 import { dismissDigest, renderDigest } from './digest.js';
 
@@ -36,6 +36,7 @@ const ACTIONS = {
   // Pantalla de inicio
   titlePlay: () => playFromTitle(),
   titleSkip: () => skipTitleIntro(),
+  titleTutorial: () => { wantTutorial(); playFromTitle(); toast('Elige un golpe: el tutorial te guía en tu primera fuga.'); },
   // Tutorial
   tutorial: () => { if (S && !S.over) startTutorial(); else showCrimes(); },
   tutNext: () => tutNext(),

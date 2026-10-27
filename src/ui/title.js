@@ -59,6 +59,7 @@ export function showTitle(play) {
     <div class="ti-logo"><div class="ti-stamp">Pato Malo</div><p class="ti-tag">«Nadie atrapa a un pato con estilo.»</p></div>
     <div class="ti-menu">
       <button type="button" class="btn big ti-play" data-act="titlePlay">Jugar</button>
+      <button type="button" class="btn ghost ti-tut" data-act="titleTutorial"><b>?</b>Tutorial: aprende a escapar</button>
       <p class="ti-rec">${car.played ? `${car.escapes} de ${car.played} fugas exitosas · ${car.points.toLocaleString('es-CL')} pts` : 'Escapa de la PDI por Chile, Sudamérica y el mundo'}</p>
       <div class="ti-vs"><img src="${face('burlo')}" alt="" width="34" height="34"><span>vs</span><img src="${detFace('serio')}" alt="" width="34" height="34"><small>Detective Patrick McCuack · «La ley también tiene patas»</small></div>
     </div>
