@@ -75,7 +75,13 @@ function place() {
   spot.hidden = false;
   const r = el.getBoundingClientRect(), pad = 6;
   Object.assign(spot.style, { left: `${r.left - pad}px`, top: `${r.top - pad}px`, width: `${r.width + pad * 2}px`, height: `${r.height + pad * 2}px` });
-  const below = r.top + r.height / 2 < innerHeight / 2;
-  card.style.top = below ? `${Math.min(innerHeight - 40, r.bottom + 16)}px` : '';
-  card.style.bottom = below ? '' : `${Math.max(12, innerHeight - r.top + 16)}px`;
+  // La tarjeta va donde quepa entera: abajo o arriba del elemento; si no cabe en ninguno
+  // (el mapa ocupa casi toda la pantalla), queda pegada abajo, encima del elemento.
+  const H = innerHeight, gap = 12;
+  card.style.top = ''; card.style.bottom = '';
+  const ch = card.offsetHeight;
+  const room = { below: H - r.bottom - 16 - gap, above: r.top - 16 - gap };
+  if (room.below >= ch && (room.below >= room.above || room.above < ch)) card.style.top = `${r.bottom + 16}px`;
+  else if (room.above >= ch) card.style.bottom = `${H - r.top + 16}px`;
+  else card.style.bottom = `${gap}px`;
 }

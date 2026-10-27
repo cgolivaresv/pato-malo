@@ -25,7 +25,7 @@ Juego de escape en el navegador. Acabas de dar un golpe en una ciudad de Chile y
 - **Recompensas diarias.** Cada 24 horas sin ser atrapado ganas dinero u objetos útiles.
 - **Calor por país.** Cada país tiene su propio calor. La noticia sale donde te descubren y se filtra un poco a los vecinos; al cruzar una frontera llegas con el calor de ese país.
 - **Geografía real.** Invierno o verano: en invierno la nieve cierra los pasos entre Chile y Argentina en el centro y sur. Transbordador de Chacao a Chiloé, barcaza de la Carretera Austral a Coyhaique (08:00), bus a Magallanes por Argentina, barco semanal Puerto Montt–Puerto Natales y controles aduaneros de la Ruta 5 en el Norte Grande.
-- **Música y sonidos.** Tema policial noir generado en el navegador (Web Audio, sin archivos): bajo, batería con swing y guitarra con eco. Se acelera y se pone más tensa con el peligro, y suena una sirena lejana cuando la brigada está en tu ciudad. Cada botón, viaje, sello, evento y final tiene su sonido. El botón de nota musical cambia entre música y sonidos, solo sonidos o silencio.
+- **Música y sonidos.** Tema de misterio policial generado en el navegador (Web Audio, sin archivos): tic-tac de reloj, bajo que desciende de a medio tono, acordes sostenidos, vibráfono con eco y violonchelo. Se acelera y suma timbales, latido y cuerdas en staccato con el peligro, y suena una sirena lejana cuando la brigada está en tu ciudad. Cada botón, viaje, sello, evento y final tiene su sonido. El botón de nota musical cambia entre música y sonidos, solo sonidos o silencio.
 - **Tutorial.** Pato Malo guía la primera fuga; se puede repetir desde la pantalla de inicio o con el botón «?».
 
 ## Desarrollo

@@ -442,7 +442,7 @@ a { color: var(--sodium); }
 .tut { position: fixed; inset: 0; z-index: 35; }
 .tut.center { background: #0a080cd9; }
 .tut-spot { position: fixed; border-radius: 14px; box-shadow: 0 0 0 9999px #0a080cd0, 0 0 0 3px var(--sodium); transition: all .3s cubic-bezier(.2, .8, .2, 1); pointer-events: none; }
-.tut-card { position: fixed; left: var(--gutter); right: var(--gutter-r); margin: 0 auto; max-width: 460px; display: flex; gap: 12px; align-items: flex-start; background: var(--paper) var(--noise); border: 1px solid var(--line); border-radius: 16px; padding: 14px; box-shadow: 0 18px 50px #000c; animation: slideUp .3s cubic-bezier(.2, .8, .2, 1); }
+.tut-card { position: fixed; left: var(--gutter); right: var(--gutter-r); margin: 0 auto; max-width: 460px; display: flex; gap: 12px; align-items: flex-start; background: var(--paper) var(--noise); border: 1px solid var(--line); border-radius: 16px; padding: 14px; box-shadow: 0 18px 50px #000c; max-height: calc(100% - 24px); overflow-y: auto; overscroll-behavior: contain; animation: slideUp .3s cubic-bezier(.2, .8, .2, 1); }
 .tut.center .tut-card { top: 50%; transform: translateY(-50%); animation: fade .3s; }
 .tut-card img { width: 64px; height: 64px; flex: none; border-radius: 50%; border: 2px solid var(--sodium); background: var(--paper-2); object-fit: cover; object-position: top; }
 .tut-txt { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
@@ -450,6 +450,7 @@ a { color: var(--sodium); }
 .tut-txt b { font-family: var(--f-display); font-weight: 900; font-size: 22px; text-transform: uppercase; letter-spacing: .02em; line-height: 1; }
 .tut-txt p { margin: 0; font-size: 14.5px; line-height: 1.4; }
 .tut-act { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+@media (max-height: 700px) { .tut-card img { width: 44px; height: 44px; } .tut-txt p { font-size: 13.5px; } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } }
 
 /* ---------- Mapa de fuga ---------- */

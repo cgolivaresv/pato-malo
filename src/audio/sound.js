@@ -1,6 +1,6 @@
 // Música y efectos de sonido, generados en el navegador con Web Audio (sin archivos de audio).
-// La música es un tema policial "noir" en Mi menor: bajo, batería con swing y una guitarra
-// con eco. Tiene tres niveles de tensión que cambian con el peligro de la fuga.
+// La música es un tema de misterio policial en Re menor: tic-tac de reloj, bajo que desciende
+// de a medio tono, acordes sostenidos y un vibráfono con eco. Tiene tres niveles de tensión que cambian con el peligro de la fuga.
 // El navegador solo deja sonar audio después de un toque del jugador, por eso todo arranca con unlock().
 import { store } from '../lib/util.js';
 
@@ -20,11 +20,11 @@ function init() {
   const comp = ctx.createDynamicsCompressor();
   comp.threshold.value = -16; comp.ratio.value = 4;
   master.connect(comp).connect(ctx.destination);
-  musicBus = ctx.createGain(); musicBus.gain.value = mode === 'all' ? 0.5 : 0; musicBus.connect(master);
+  musicBus = ctx.createGain(); musicBus.gain.value = mode === 'all' ? 0.65 : 0; musicBus.connect(master);
   sfxBus = ctx.createGain(); sfxBus.gain.value = mode === 'off' ? 0 : 0.55; sfxBus.connect(master);
   // Eco tipo guitarra de película policial
   delay = ctx.createDelay(1);
-  delay.delayTime.value = 0.27;
+  delay.delayTime.value = 0.36;
   const fb = ctx.createGain(); fb.gain.value = 0.32;
   const wet = ctx.createGain(); wet.gain.value = 0.35;
   delay.connect(fb).connect(delay);
@@ -54,7 +54,7 @@ export function cycleSound() {
   store(KEY, { mode });
   if (init()) {
     const t = ctx.currentTime;
-    musicBus.gain.setTargetAtTime(mode === 'all' ? 0.5 : 0, t, 0.15);
+    musicBus.gain.setTargetAtTime(mode === 'all' ? 0.65 : 0, t, 0.15);
     sfxBus.gain.setTargetAtTime(mode === 'off' ? 0 : 0.55, t, 0.05);
     if (mode !== 'off' && ctx.state === 'suspended') ctx.resume();
     if (mode === 'all' && wantMusic && !playing) startMusic();
@@ -91,35 +91,41 @@ function noise(bus, { t, type = 'highpass', f = 7000, f2, q = 0.8, a = 0.002, de
 }
 
 // ---------- Música ----------
-// 4 compases de 8 corcheas con swing: Mi m · Mi m · Do · Si7
-const BASS = [
-  [40, null, 47, 40, 50, null, 47, 45],
-  [40, null, 47, 40, 52, 50, 47, 43],
-  [36, null, 43, 36, 45, null, 43, 40],
-  [35, null, 42, 35, 45, 44, 42, 39],
+// Misterio policial en Re menor, sin swing. 8 compases de 8 corcheas.
+// El bajo baja de a medio tono (Re, Do#, Do, Si, Sib, La) bajo un acorde de Re menor que cambia
+// de color; arriba, un vibráfono con eco deja pistas sueltas y un reloj marca el tic-tac.
+const ROOT = [38, 37, 36, 35, 34, 34, 33, 33];
+const CHORDS = [[50, 53, 57], [49, 53, 57], [48, 53, 57], [47, 53, 57], [46, 50, 53, 57], [46, 50, 53, 57], [45, 49, 52, 55, 58], [45, 49, 52, 55]];
+const VIBE = [
+  [69, null, null, null, 77, null, 76, null],
+  [null, null, 73, null, null, null, null, null],
+  [72, null, null, 74, null, 72, null, 69],
+  [71, null, null, null, null, null, null, null],
+  [70, null, 74, null, 77, null, 81, null],
+  [79, null, null, 77, null, null, null, null],
+  [76, null, null, null, 73, null, 70, null],
+  [69, null, null, null, null, null, null, null],
 ];
-const LEAD_A = [
-  [null, null, null, null, 71, null, 74, null],
-  [76, null, null, 74, 71, null, null, null],
-  [72, null, null, null, 71, 72, 74, null],
-  [75, null, null, null, 71, null, null, null],
+// Respuesta grave (violonchelo) en la segunda vuelta
+const CELLO = [
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, 57, null, 56, null],
+  [null, null, null, null, 55, null, 53, null],
+  [null, null, null, null, 52, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, 53, null, 55, null],
+  [null, null, null, null, 57, null, 58, null],
+  [57, null, null, null, null, null, null, null],
 ];
-const LEAD_B = [
-  [79, null, 78, null, 76, null, null, 74],
-  [76, null, null, null, null, null, 71, 74],
-  [76, null, 74, null, 72, null, 71, null],
-  [71, null, 72, null, 75, null, 78, null],
-];
-const CHORDS = [[52, 55, 59], [52, 55, 59], [48, 52, 55], [47, 51, 54, 57]];
-const TEMPO = [100, 114, 132];
+const TEMPO = [84, 94, 112];
 
 let playing = false, wantMusic = false, level = 0, nextLevel = 0;
-let timer = 0, step = 0, bar = 0, nextT = 0, tempo = TEMPO[0];
+let timer = 0, step = 0, bar = 0, cycle = 0, nextT = 0, tempo = TEMPO[0];
 
 function startMusic() {
   if (!ctx || playing) return;
   playing = true;
-  step = 0; bar = 0; tempo = TEMPO[nextLevel]; level = nextLevel;
+  step = 0; bar = 0; cycle = 0; tempo = TEMPO[nextLevel]; level = nextLevel;
   nextT = ctx.currentTime + 0.08;
   timer = setInterval(schedule, 25);
 }
@@ -138,52 +144,65 @@ export function musicLevel(l) { nextLevel = Math.max(0, Math.min(2, l)); }
 function schedule() {
   while (nextT < ctx.currentTime + 0.15) {
     playStep(step, bar, nextT);
-    const beat = 60 / tempo;
-    nextT += beat * (step % 2 === 0 ? 0.6 : 0.4); // swing
+    nextT += 30 / tempo; // corchea
     step++;
     if (step === 8) {
-      step = 0; bar = (bar + 1) % 8;
+      step = 0; bar++;
+      if (bar === 8) { bar = 0; cycle++; }
       if (bar % 2 === 0) { level = nextLevel; tempo = TEMPO[level]; }
     }
   }
 }
 
-function playStep(s, b, t) {
-  const B = b % 4, second = b >= 4;
-  const hot = level === 2;
-  // Bajo
-  const bn = BASS[B][s];
-  if (bn != null) tone(musicBus, { type: 'triangle', f: midi(bn), t, a: 0.006, dec: hot ? 0.22 : 0.32, vol: 0.5, lp: 700 });
-  // Platillo con swing (más marcado en el contratiempo)
-  noise(musicBus, { t, f: 7500, dec: s % 2 ? 0.05 : 0.03, vol: s % 2 ? 0.07 : 0.04 });
-  if (hot && s % 2) noise(musicBus, { t: t + 0.06, f: 9000, dec: 0.02, vol: 0.03 });
-  // Bombo en 1 y 3
-  if (s === 0 || s === 4 || (hot && s === 7)) tone(musicBus, { f: 120, f2: 42, t, a: 0.003, dec: 0.16, vol: 0.55 });
-  // Caja con escobilla en 2 y 4
-  if (level >= 1 && (s === 2 || s === 6)) noise(musicBus, { t, type: 'bandpass', f: 1900, q: 0.9, dec: 0.11, vol: 0.13 });
-  // Guitarra con eco: en calma solo la segunda vuelta; con tensión, siempre
-  const lead = (second ? LEAD_B : LEAD_A)[B][s];
-  if (lead != null && (level >= 1 || second)) {
-    const o = tone(musicBus, { type: 'square', f: midi(lead), t, a: 0.01, dec: 0.38, vol: 0.09, lp: 1700, q: 2, send: 0.6 });
-    const lfo = ctx.createOscillator(), lg = ctx.createGain();
-    lfo.frequency.value = 5.5; lg.gain.value = 9; lfo.connect(lg).connect(o.detune);
-    lfo.start(t); lfo.stop(t + 0.45);
+// Vibráfono: dos senos (fundamental y brillo) con trémolo y eco
+function vibe(n, t, vol) {
+  const g = ctx.createGain(), trem = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+  for (const [mul, v] of [[1, 1], [4, 0.18], [10.1, 0.05]]) {
+    const o = ctx.createOscillator(), og = ctx.createGain();
+    o.frequency.value = midi(n) * mul; og.gain.value = v;
+    o.connect(og).connect(g); o.start(t); o.stop(t + 2.2);
   }
-  // Colchón de acordes al empezar cada compás (tensión y peligro)
-  if (s === 0 && level >= 1) {
-    for (const n of CHORDS[B]) {
-      tone(musicBus, { type: 'sawtooth', f: midi(n), t, a: 0.25, dec: 1.4, vol: hot ? 0.035 : 0.025, lp: hot ? 1100 : 800, detune: -6 });
-      tone(musicBus, { type: 'sawtooth', f: midi(n), t, a: 0.25, dec: 1.4, vol: hot ? 0.035 : 0.025, lp: hot ? 1100 : 800, detune: 6 });
+  lfo.frequency.value = 5.2; lg.gain.value = 0.25; trem.gain.value = 0.75;
+  lfo.connect(lg).connect(trem.gain); lfo.start(t); lfo.stop(t + 2.2);
+  g.connect(trem).connect(musicBus);
+  const s = ctx.createGain(); s.gain.value = 0.7; trem.connect(s).connect(delay);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, t + 2.1);
+}
+
+function playStep(s, b, t) {
+  const hot = level === 2;
+  const second = cycle % 2 === 1;
+  // Tic-tac de reloj en cada negra
+  if (s % 2 === 0) noise(musicBus, { t, type: 'bandpass', f: s % 4 === 0 ? 3200 : 2500, q: 6, dec: 0.025, vol: 0.12 });
+  // Bajo pulsado: negras en calma, corcheas con tensión, saltos de octava en peligro
+  if (level >= 1 || s % 2 === 0) {
+    const n = ROOT[b] + (hot && s % 2 ? 12 : 0);
+    tone(musicBus, { type: 'triangle', f: midi(n), t, a: 0.005, dec: 0.22, vol: s === 0 ? 0.5 : 0.36, lp: 500 });
+  }
+  // Acorde sostenido al empezar cada compás
+  if (s === 0) {
+    for (const n of CHORDS[b]) {
+      for (const dt of [-7, 7]) tone(musicBus, { type: 'sawtooth', f: midi(n), t, a: 0.6, dec: 2.6, vol: 0.016, lp: hot ? 1000 : 650, detune: dt });
     }
   }
-  // Peligro: una sirena lejana cada dos compases
-  if (hot && s === 0 && b % 2 === 0) {
+  // Timbal grave al comienzo de cada par de compases (tensión)
+  if (level >= 1 && s === 0 && b % 2 === 0) tone(musicBus, { f: midi(ROOT[b]) * 2, f2: midi(ROOT[b]) * 1.8, t, a: 0.01, dec: 0.9, vol: 0.35 });
+  // Latido en peligro
+  if (hot && (s === 0 || s === 1 || s === 4 || s === 5)) tone(musicBus, { f: 70, f2: 40, t: t + (s % 2 ? 0.02 : 0), a: 0.003, dec: 0.14, vol: s % 2 ? 0.25 : 0.4 });
+  // Vibráfono: en calma solo vueltas alternas; con tensión, siempre
+  const v = VIBE[b][s];
+  if (v != null && (level >= 1 || second)) vibe(v + (second && level >= 1 ? 12 : 0), t, 0.11);
+  // Violonchelo con arco en la segunda vuelta
+  const c = CELLO[b][s];
+  if (c != null && second) tone(musicBus, { type: 'sawtooth', f: midi(c), t, a: 0.12, dec: 0.9, vol: 0.05, lp: 900, q: 1.5 });
+  // Peligro: cuerdas en staccato a contratiempo y sirena lejana
+  if (hot && s % 2) for (const n of CHORDS[b].slice(0, 3)) tone(musicBus, { type: 'sawtooth', f: midi(n + 12), t, a: 0.004, dec: 0.1, vol: 0.02, lp: 2200 });
+  if (hot && s === 0 && b % 4 === 0) {
     const o = ctx.createOscillator(), g = ctx.createGain(), fl = ctx.createBiquadFilter();
     o.type = 'triangle'; fl.type = 'lowpass'; fl.frequency.value = 1400;
-    o.frequency.setValueAtTime(660, t);
     for (let i = 0; i < 4; i++) o.frequency.setValueAtTime(i % 2 ? 660 : 880, t + i * 0.45);
     o.connect(fl).connect(g).connect(musicBus);
-    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.03, t + 0.3); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.025, t + 0.3); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
     o.start(t); o.stop(t + 1.9);
   }
 }
