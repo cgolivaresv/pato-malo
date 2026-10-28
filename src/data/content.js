@@ -7,7 +7,7 @@
 // interpol: Infinity = Interpol no entra al caso
 export const CRIMES = [
   {
-    id: 'lanzazo', n: 'Lanzazo en el Persa Biobío', rank: 0, lvl: 1, kind: 'cash', city: 'santiago',
+    id: 'lanzazo', n: 'Lanzazo en el persa', rank: 0, lvl: 1, kind: 'cash',
     cash: 500000, alarm: 1, interpol: Infinity, heat: 12,
     loot: 'una mochila con $2 millones',
     d: 'Un golpe chico para partir. Cruza la frontera y escóndete en una casa segura fuera de Chile.',
@@ -21,10 +21,10 @@ export const CRIMES = [
     obj: ['cross'], lot: { n: 'un rollo de billetes', count: 2, val: 250000 },
   },
   {
-    id: 'cambio', n: 'Golpe a una casa de cambio en el centro', rank: 2, lvl: 3, kind: 'cash', city: 'santiago',
+    id: 'cambio', n: 'Golpe a una casa de cambio', rank: 2, lvl: 3, kind: 'cash',
     cash: 3400000, alarm: 2, interpol: 120, heat: 20,
     loot: 'USD 300.000 en efectivo',
-    d: 'Dólares limpios, pero el centro está lleno de cámaras. Arma tu plan de escape y sal del continente.',
+    d: 'Dólares limpios, pero el centro está lleno de cámaras. Después arma tu plan de escape y sal del continente.',
     obj: ['leave'], lot: { n: 'un fajo de dólares', count: 3, val: 1000000 },
   },
   {
@@ -49,14 +49,14 @@ export const CRIMES = [
     obj: ['deliver'], lot: { n: 'una pieza menor del mismo robo', count: 2, val: 900000 },
   },
   {
-    id: 'casino', n: 'La bóveda del casino de Viña', rank: 4, lvl: 5, kind: 'cash', marked: true, city: 'valparaiso',
+    id: 'casino', n: 'La bóveda de un casino', rank: 4, lvl: 5, kind: 'cash', marked: true,
     cash: 4000000, alarm: 0.5, interpol: 24, heat: 35,
     loot: '$900 millones en billetes marcados',
     d: 'El golpe del siglo. Billetes marcados, la prensa entera encima e Interpol desde el primer día.',
     obj: ['leave'], lot: { n: 'un maletín de fichas y fajos', count: 4, val: 2200000 },
   },
   {
-    id: 'boveda', n: 'Lingotes del Banco Central', rank: 4, lvl: 5, kind: 'goods', gn: 'oro', goods: 'el oro', city: 'santiago',
+    id: 'boveda', n: 'Lingotes de una bóveda bancaria', rank: 4, lvl: 5, kind: 'goods', gn: 'oro', goods: 'el oro',
     cash: 1500000, alarm: 2, interpol: 36, heat: 30,
     loot: 'lingotes de oro por $600 millones', lootVal: 600e6,
     d: 'Hay que vender el oro a un reducidor antes de salir del continente. Interpol entra al caso al día y medio.',

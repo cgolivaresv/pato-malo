@@ -6,9 +6,9 @@ Juego de escape en el navegador. Acabas de dar un golpe en una ciudad de Chile y
 
 ## Cómo se juega
 
-1. Elige un golpe. Hay ocho, de menor a mayor dificultad: lanzazo en el Persa Biobío, bomba de bencina en la Ruta 5, casa de cambio, camión de valores, joyería, óleo colonial, casino de Viña y lingotes del Banco Central; los grandes se desbloquean con experiencia.
-2. **Planea el golpe** en cinco pasos: reconocimiento, equipo (chofer, hacker, campana), horario, herramientas y cómo te vas del lugar. Cada opción muestra su costo y cómo cambia la probabilidad de que salga limpio, con testigos o con la alarma sonando.
-3. Da el golpe: el resultado fija cómo empieza la fuga (botín, horas antes de la alarma, calor, rastros y desde qué ciudad partes).
+1. Elige un golpe. Hay ocho, de menor a mayor dificultad: lanzazo en el persa, bomba de bencina en la Ruta 5, casa de cambio, camión de valores, joyería, óleo colonial, la bóveda de un casino y lingotes de una bóveda bancaria; los grandes se desbloquean con experiencia.
+2. **Prepara el golpe** en una ciudad chilena al azar, cada una con su sello (ascensores en Valparaíso, metro en Santiago, muelle en los puertos). Hay un imprevisto del día (lluvia, paro de micros, partido de la Roja, temblor…) y a veces un capo te ofrece un encargo con condiciones. Arma tu equipo con personajes que cobran su parte y pueden sapearte, soborna al conserje o a un guardia, compra los planos, trabaja de aseador para entrar desde adentro, cava un túnel, haz una llamada falsa a Carabineros, compra herramientas y deja un vehículo (y un plan B). Cada preparativo despierta la sospecha de McCuack, que puede aparecer de civil.
+3. **Da el golpe por turnos** en el plano del barrio: camina casilla por casilla, esquiva los conos de visión de guardias y cámaras, fuerza puertas, corta la luz o las cámaras, distrae a los guardias y decide cuánto botín cargar (más peso, más lento). Si suena la alarma, Carabineros sale del retén. Lo que pase ahí (grabado, visto, alarma, por dónde saliste) define cómo empieza la fuga.
 4. Huye. En los golpes chicos basta con llegar a una casa segura fuera de Chile; en los grandes hay que armar un **plan de escape** con un capitán de carguero, un piloto de avioneta o un falsificador maestro, siguiendo rumores que pueden ser falsos.
 5. Muévete por el mapa en bus, avión, paso clandestino o barco, esquivando los controles y la zona de búsqueda de McCuack. Escóndete, disfrázate, consigue plata y sal del continente.
 6. Gana experiencia, sube de rango (Ratero, Lanza, Choro, Capo, Leyenda) y mejora habilidades en tu **prontuario**.
@@ -16,7 +16,9 @@ Juego de escape en el navegador. Acabas de dar un golpe en una ciudad de Chile y
 ## Lo que lo hace distinto
 
 - **Carrera criminal.** Experiencia por cada golpe, día libre y fuga exitosa (algo se gana aunque te atrapen). Cinco rangos desbloquean golpes nuevos. Cada rango y cada fuga dan un punto de habilidad: Sigilo (rastros que nunca aparecen), Labia (rumores más confiables), Contactos (más casas seguras y contactos más baratos), Manos rápidas (más botín) y Aguante (más horas sin dormir). Se guarda en el navegador.
-- **Planificación del golpe.** Decisiones con costo y riesgo a la vista; el equipo cobra su parte y puede sapearte durante la fuga.
+- **Golpe táctico.** Plano generado en cada partida, con niebla en las piezas que no conoces, guardias con sospecha (¿?) y rondas, cámaras, ruido, botín con peso y salida por la ciudad con patrullas.
+- **Equipo que dura.** Los integrantes que salen bien suben de nivel (cobran menos y sapean menos); los que caen quedan presos unos golpes y desde la cárcel pueden sapearte.
+- **Ciudades con memoria.** Donde ya robaste hay más guardias, más cámaras y tu cara en los carteles.
 
 - **Plan de escape.** Tres salidas, cada una con un contacto escondido que hay que encontrar siguiendo rumores. Volar directo con tu documento real casi nunca funciona: migraciones te espera.
 - **Rastros con retraso.** Cada acción puede dejar una huella que la policía descubre horas después.
@@ -55,7 +57,8 @@ src/
   data/
     places.js         Países y 70 ciudades con coordenadas
     geo.js            Agrupaciones: Sudamérica, ciudades grandes, aeropuertos, fronteras
-    content.js        Golpes, rangos, habilidades, opciones de planificación, botín y recompensas
+    content.js        Golpes, rangos, habilidades, botín y recompensas
+    heistdata.js      Ciudades, equipo, imprevistos, encargos, preparativos y herramientas del golpe
     map.json          Contornos de cada país ya proyectados, con punto para su nombre
   lib/util.js         Utilidades (distancias, reloj, formato de dinero)
   game/               Lógica: no depende de la interfaz
@@ -66,7 +69,8 @@ src/
     money.js          Formas de conseguir dinero
     heat.js           Calor por país
     plan.js           Plan de escape: rumores, contactos y salidas
-    heist.js          Planificación y resultado del golpe
+    heist.js          Preparación del golpe y paso del plano a la fuga
+    board.js          Golpe táctico por turnos: plano, guardias, cámaras, ruido, alarma y patrullas
     career.js         Experiencia, rangos, golpes desbloqueados y habilidades
     pursuit.js        Zona de búsqueda, controles y riesgo de redada
     events.js         Eventos con decisiones
@@ -78,7 +82,8 @@ src/
     icons.js          Iconos SVG
     screens.js        Elegir golpe, informe y resultado
     digest.js         Parte de novedades después de cada acción
-    heistui.js        Escalera de golpes, planificación, resultado del golpe y prontuario
+    heistui.js        Escalera de golpes, preparación, resultado del golpe y prontuario
+    boardui.js        Pantalla del plano del golpe
     events.js         Manejador único de clics (data-act / data-arg)
   assets/pato/        Ilustración y 8 expresiones del pato (WebP, fondo limpio)
   assets/detective/   Ilustración y 6 expresiones del detective McCuack

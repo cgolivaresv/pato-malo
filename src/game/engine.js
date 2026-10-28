@@ -174,7 +174,7 @@ export function finish(win, msg) {
   const pts = win ? Math.round(cr.lvl * 1000 + Math.max(0, S.cash) / 2000 + Math.max(0, 240 - S.hours) * 8) : 0;
   S.over = { win, msg, pts };
   // Experiencia y rango de la carrera criminal
-  if (!S.sim) S.over.career = recordRun({ crimeId: cr.id, lvl: cr.lvl, days: S.days, win, clean: S.heist && S.heist.outcome === 'clean', pts });
+  if (!S.sim) S.over.career = recordRun({ crimeId: cr.id, lvl: cr.lvl, days: S.days, win, clean: S.heist && S.heist.outcome === 'clean', pts, extra: S.heist && S.heist.contract && S.heist.contract.ok ? [['Encargo cumplido', 25 * cr.lvl]] : [] });
   render();
   showEnd();
 }

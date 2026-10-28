@@ -11,13 +11,14 @@ function fresh() {
   // Quien ya jugaba antes de la carrera no parte de cero
   const old = store('fuga-career');
   const xp = old ? Math.min(900, (old.escapes || 0) * 180 + (old.played || 0) * 25) : 0;
-  return { xp, sp: rankOf(xp), skills, golpes: 0, escapes: old ? old.escapes || 0 : 0, played: old ? old.played || 0 : 0, points: old ? old.points || 0 : 0, best: {} };
+  return { xp, sp: rankOf(xp), skills, crew: {}, cities: {}, golpes: 0, escapes: old ? old.escapes || 0 : 0, played: old ? old.played || 0 : 0, points: old ? old.points || 0 : 0, best: {} };
 }
 
 export function career() {
   const c = store(KEY);
   if (c && c.skills) {
     for (const k of Object.keys(SKILLS)) if (c.skills[k] == null) c.skills[k] = 0;
+    c.crew = c.crew || {}; c.cities = c.cities || {};
     return c;
   }
   const f = fresh();
@@ -49,8 +50,8 @@ export function buySkill(k) {
 export const MAX_SKILL_LVL = MAX_SKILL;
 
 // Experiencia que deja una fuga. Siempre se gana algo, aunque te atrapen.
-export function xpFor({ lvl, days, win, clean }) {
-  const parts = [['Golpe dado', 30 * lvl]];
+export function xpFor({ lvl, days, win, clean, extra = [] }) {
+  const parts = [['Golpe dado', 30 * lvl], ...extra];
   if (days) parts.push([`${days} ${days === 1 ? 'día libre' : 'días libres'}`, 10 * days]);
   if (clean) parts.push(['Golpe limpio', 15 * lvl]);
   if (win) parts.push(['Fuga exitosa', 80 * lvl]);
@@ -58,9 +59,9 @@ export function xpFor({ lvl, days, win, clean }) {
 }
 
 // Registra el final de una fuga. Devuelve lo ganado y si subiste de rango.
-export function recordRun({ crimeId, lvl, days, win, clean, pts }) {
+export function recordRun({ crimeId, lvl, days, win, clean, pts, extra }) {
   const c = career();
-  const parts = xpFor({ lvl, days, win, clean });
+  const parts = xpFor({ lvl, days, win, clean, extra });
   const gain = parts.reduce((a, p) => a + p[1], 0);
   const before = rankOf(c.xp);
   c.xp += gain;
@@ -74,4 +75,24 @@ export function recordRun({ crimeId, lvl, days, win, clean, pts }) {
   store('fuga-career', { escapes: c.escapes, played: c.played, points: c.points });
   const newCrimes = CRIMES.filter((cr) => cr.rank > before && cr.rank <= after).map((cr) => cr.n);
   return { parts, gain, before, after, newCrimes, points: (win ? 1 : 0) + (after - before) };
+}
+
+// ---------- Equipo que dura entre partidas y ciudades con memoria ----------
+// crew[id] = { runs, lvl (1-3), jail (golpes que le quedan preso) }
+export function crewInfo(id) { const c = store(KEY); return (c && c.crew && c.crew[id]) || { runs: 0, lvl: 1, jail: 0 }; }
+export function cityCount(id) { const c = store(KEY); return (c && c.cities && c.cities[id]) || 0; }
+
+// Después de dar un golpe: el equipo gana experiencia, los que cayeron quedan presos,
+// los presos cumplen un golpe de condena y la ciudad recuerda.
+export function afterHeist({ crewIds = [], fallen = [], city }) {
+  const c = career();
+  for (const [id, m] of Object.entries(c.crew)) if (m.jail > 0 && !fallen.includes(id)) m.jail--;
+  for (const id of crewIds) {
+    const m = c.crew[id] || { runs: 0, lvl: 1, jail: 0 };
+    if (fallen.includes(id)) m.jail = 3;
+    else { m.runs++; m.lvl = Math.min(3, 1 + Math.floor(m.runs / 2)); }
+    c.crew[id] = m;
+  }
+  if (city) c.cities[city] = (c.cities[city] || 0) + 1;
+  save(c);
 }

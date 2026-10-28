@@ -11,7 +11,8 @@ import { finish } from '../game/engine.js';
 import { render, toast, ui } from './render.js';
 import { destList } from './sheets.js';
 import { showCrimes, startGame, closeOv, begin } from './screens.js';
-import { startPlan, planPick, planStep, planGo, showCareer, skillUp } from './heistui.js';
+import { startPrep, prepSet, prepGo, mccSwap, mccStay, showCareer, skillUp } from './heistui.js';
+import { boardTap, boardAct, boardBack } from './boardui.js';
 import { zoomMe, zoomWorld, zoomBy } from './map.js';
 import { playTravel, hideStamp } from './fx.js';
 import { I } from './icons.js';
@@ -24,7 +25,7 @@ import { unlock, sfx, cycleSound, soundMode } from '../audio/sound.js';
 const SOUND_OF = {
   sheet: (a) => (S && S.tab === a ? 'close' : 'open'), closeSheet: 'close', closeOv: 'close', digestOk: 'close',
   rest: 'rest', lowProfile: 'rest', disguise: 'swish', soplon: 'ask', ask: 'ask',
-  forgeCheap: 'paper', forgeTop: 'paper', start: 'paper', crimes: 'paper', planPick: 'tap', planStep: 'paper', planGo: null, heistGo: 'siren', careerOpen: 'paper', skillUp: null, begin: 'tap',
+  forgeCheap: 'paper', forgeTop: 'paper', start: 'paper', crimes: 'paper', prepSet: 'tap', prepGo: 'paper', mccSwap: 'tap', mccStay: 'siren', hzCell: null, hzAct: null, hzBack: 'close', heistGo: 'siren', careerOpen: 'paper', skillUp: null, begin: 'tap',
   sellFence: 'cash', sellLot: 'cash', sellItem: 'cash', acceptJob: 'cash', robbery: 'cash', borrow: 'cash', repay: 'cash', hire: 'cash',
   leave: (k) => (k === 'captain' ? 'ship' : 'air'), eventChoice: 'resolve', surrender: 'deny',
   travel: null, sound: null, titleSkip: null,
@@ -40,10 +41,14 @@ let surrenderArmed = false;
 const ACTIONS = {
   // Pantallas
   crimes: () => showCrimes(),
-  start: (id) => startPlan(id),
-  planPick: (a) => planPick(a),
-  planStep: (d) => planStep(d),
-  planGo: () => planGo(),
+  start: (id) => startPrep(id),
+  prepSet: (a) => prepSet(a),
+  prepGo: () => prepGo(),
+  mccSwap: () => mccSwap(),
+  mccStay: () => mccStay(),
+  hzCell: (a) => boardTap(a),
+  hzAct: (a) => boardAct(a),
+  hzBack: () => boardBack(),
   heistGo: () => startGame(),
   careerOpen: () => showCareer(),
   skillUp: (k) => skillUp(k),

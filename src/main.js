@@ -21,6 +21,8 @@ if (import.meta.env.DEV) {
   Promise.all([import('./game/state.js'), import('./game/events.js'), import('./ui/render.js')]).then(([st, ev, ui]) => {
     window.__dev = {
       S: () => st.S,
+      // Termina el golpe táctico al tiro (escapado o detenido)
+      finishHeist: (caught) => import('./ui/boardui.js').then((m) => m.devFinish(caught)),
       // Fuerza un evento por id para revisarlo en pantalla
       event: (id) => { const e = ev.EVENTS.find((x) => x.id === id); st.S.event = { id, ctx: { kind: 'city' }, vals: e.vals ? e.vals({ kind: 'city' }) : {}, result: null }; st.S.evCount++; ui.render(); },
     };

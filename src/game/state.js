@@ -42,7 +42,7 @@ export function newGame(id, setup = execute(id)) {
   contacts.captain.days = [d, (d + 3) % 7];
 
   return {
-    crime: id, cr, heist: { outcome: setup.outcome, plan: setup.plan, notes: setup.notes }, t0: setup.t0,
+    crime: id, cr, heist: { outcome: setup.outcome, plan: setup.plan, notes: setup.notes, contract: setup.contract || null, summary: setup.summary || null }, t0: setup.t0,
     cur: setup.cur, start: start.id, path: setup.cur === start.id ? [start.id] : [start.id, setup.cur], hours: setup.hours, cash: cr.cash, heat: setup.heat, awake: 4 + setup.hours,
     // Documento: real · cheap (pasaporte barato) · top (pasaporte de calidad)
     id: 'real', passQ: null, idBurnSecret: false, disguiseUntil: setup.disguiseUntil, soplonUntil: setup.soplonUntil,
