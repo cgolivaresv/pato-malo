@@ -3,7 +3,8 @@
 import '../src/styles.css';
 import { initMap } from '../src/ui/map.js';
 import { CITIES, CITY, HUB, BIG, inSA } from '../src/data/geo.js';
-import { CONTACTS } from '../src/data/content.js';
+import { CONTACTS, CRIMES } from '../src/data/content.js';
+import { execute, defaultPlan } from '../src/game/heist.js';
 import { S, setS, newGame } from '../src/game/state.js';
 import { travel, rest, lowProfile } from '../src/game/actions.js';
 import { sellLot, sellItem } from '../src/game/money.js';
@@ -14,6 +15,19 @@ import { eventChoices, resolveEvent, closeEvent } from '../src/game/events.js';
 import { dist } from '../src/lib/util.js';
 
 initMap();
+// El simulador no toca la carrera del jugador (y juega sin habilidades)
+try { localStorage.removeItem('pato-carrera'); } catch (e) { /* nada */ }
+const crOf = (id) => CRIMES.find((c) => c.id === id);
+// Planes de golpe: el por defecto y uno cuidadoso
+const PLANS = {
+  normal: defaultPlan(),
+  cuidadoso: { recon: 'semana', crew: ['hacker', 'campana'], hora: 'noche', tools: ['guantes', 'mascara'], salida: 'moto' },
+};
+function startSim(id, planName = 'normal') {
+  const p = PLANS[planName];
+  setS(newGame(id, execute(id, JSON.parse(JSON.stringify(p)))));
+  S.sim = true; acts = 0;
+}
 let acts = 0;
 const busy = () => S.over;
 
@@ -48,12 +62,12 @@ const restHere = () => A(rest, S.safe.includes(S.cur) ? 'safe' : 'hostal');
 
 // ---------- Estrategias ingenuas ----------
 function directo() {
-  if (S.crime === 'joyas') while (S.lots > 0 && !busy()) A(sellLot);
+  if (S.cr.kind === 'goods') while (S.lots > 0 && !busy()) A(sellLot);
   if (!HUB.has(S.cur)) go(nearestHub());
   go(exitTo());
 }
 function barato() {
-  if (S.crime === 'joyas') while (S.lots > 0 && !busy()) A(sellLot);
+  if (S.cr.kind === 'goods') while (S.lots > 0 && !busy()) A(sellLot);
   if (!HUB.has(S.cur)) go(nearestHub());
   A(forgeCheap);
   if (S.awake > 12) restHere();
@@ -99,7 +113,7 @@ function plan(pref) {
       if (big && go(big)) continue;
     }
     // Joyería: vender primero
-    if (S.crime === 'joyas' && !S.sold) {
+    if (S.cr.kind === 'goods' && !S.sold) {
       if (S.fenceKnown.includes(S.cur)) { A(sellFence); continue; }
       if (S.fenceKnown.length) { if (!go(S.fenceKnown[0])) A(lowProfile); continue; }
       if (canAsk()) { A(askAround, 'fence'); continue; }
@@ -134,35 +148,53 @@ function plan(pref) {
   }
 }
 
+// Golpes chicos: llegar a una casa segura fuera de Chile
+function cruzar() {
+  let steps = 0;
+  while (!busy() && steps++ < 80) {
+    autoEvent();
+    if (busy()) break;
+    if (S.awake >= 14) { restHere(); continue; }
+    const t = near(S.safe.filter((i) => CITY[i].c !== 'CL' && S.police.city !== i))[0];
+    if (!t || !go(t)) {
+      // Acercarse por etapas a la frontera
+      const mid = near(CITIES.filter((c) => c.c === 'CL' && !c.air && dist(c, CITY[t || S.cur]) < dist(CITY[S.cur], CITY[t || S.cur]) - 100).map((c) => c.id))[0];
+      if (!mid || !go(mid)) A(lowProfile);
+    }
+  }
+}
+
 const STRATS = {
+  cruzar,
   directo, barato,
   plan_vuelo: () => plan(['forger', 'pilot', 'captain']),
   plan_barco: () => plan(['captain', 'pilot', 'forger']),
   plan_avioneta: () => plan(['pilot', 'captain', 'forger']),
 };
 
-window.runSim = (n = 100, only) => {
+window.runSim = (n = 100, only, plans = ['normal', 'cuidadoso'], crimes = CRIMES.map((c) => c.id)) => {
   const out = {};
-  for (const name in STRATS) {
+  for (const pl of plans) for (const cr of crimes) for (const name in STRATS) {
     if (only && !only.includes(name)) continue;
-    for (const cr of ['camion', 'joyas', 'arte']) {
-      let w = 0, a = 0, h = 0, ev = 0;
-      const why = {};
-      for (let i = 0; i < n; i++) {
-        setS(newGame(cr)); acts = 0;
-        try { STRATS[name](); } catch (e) { why['error ' + e.message] = (why['error ' + e.message] || 0) + 1; }
-        ev += S.evCount;
-        if (S.over && S.over.win) { w++; a += acts; h += S.hours; }
-      else if (!S.over) (window.__stuck = window.__stuck || []).push({ cr, name, cash: Math.round(S.cash), id: S.id + (S.passQ || ''), at: CITY[S.cur].n, hours: Math.round(S.hours), contacts: Object.fromEntries(Object.entries(S.contacts).map(([k, v]) => [k, (v.found ? 'F' : 'L' + v.lvl) + ':' + CITY[v.city].n])), sold: S.sold, last: S.news.slice(-2).map((n) => n.x) });
-        else { const k = S.over ? S.over.msg.slice(0, 40) : 'sin terminar'; why[k] = (why[k] || 0) + 1; }
-      }
-      out[`${name}/${cr}`] = { gana: Math.round((w / n) * 100), acciones: w ? +(a / w).toFixed(1) : 0, horas: w ? Math.round(h / w) : 0, eventos: +(ev / n).toFixed(1), pierde: Object.entries(why).sort((x, y) => y[1] - x[1]).slice(0, 3) };
+    const cross = crOf(cr).obj.includes('cross');
+    if (cross !== (name === 'cruzar')) continue;
+    let w = 0, a = 0, h = 0, ev = 0;
+    const why = {}, outc = { clean: 0, witness: 0, alarm: 0 };
+    for (let i = 0; i < n; i++) {
+      startSim(cr, pl);
+      outc[S.heist.outcome]++;
+      try { STRATS[name](); } catch (e) { why['error ' + e.message] = (why['error ' + e.message] || 0) + 1; }
+      ev += S.evCount;
+      if (S.over && S.over.win) { w++; a += acts; h += S.hours; }
+      else if (!S.over) (window.__stuck = window.__stuck || []).push({ cr, name, cash: Math.round(S.cash), at: CITY[S.cur].n, hours: Math.round(S.hours) });
+      else { const k = S.over.msg.slice(0, 40); why[k] = (why[k] || 0) + 1; }
     }
+    out[`${pl}/${cr}/${name}`] = { gana: Math.round((w / n) * 100), horas: w ? Math.round(h / w) : 0, golpe: `${outc.clean}/${outc.witness}/${outc.alarm}`, pierde: Object.entries(why).sort((x, y) => y[1] - x[1]).slice(0, 2) };
   }
   return out;
 };
-window.logGame = (strat = 'plan_vuelo', cr = 'camion') => {
-  setS(newGame(cr)); acts = 0;
+window.logGame = (strat = 'plan_vuelo', cr = 'camion', pl = 'normal') => {
+  startSim(cr, pl);
   STRATS[strat]();
   const C = (id) => CITY[id].n;
   return { start: C(S.start), contacts: Object.fromEntries(Object.entries(S.contacts).map(([k, v]) => [k, C(v.city)])), win: S.over && S.over.win, end: S.over ? S.over.msg : 'sin terminar', hours: Math.round(S.hours), news: S.news.map((n) => `${Math.round(n.t)}h ${n.x}`) };

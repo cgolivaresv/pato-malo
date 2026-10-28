@@ -1,12 +1,12 @@
 // Contenido de cada hoja de acciones: Esconderse, Moverse, Plata, Bajo mundo y Noticias.
 // En escritorio, con ninguna hoja elegida, se muestra el resumen.
 import { CITIES, CITY, COUNTRIES, CONO, BIG, inSA } from '../data/geo.js';
-import { LOTS, CONTACTS } from '../data/content.js';
+import { CONTACTS } from '../data/content.js';
 import { esc, money, clock, dist } from '../lib/util.js';
 import { S, crime, me } from '../game/state.js';
 import { modes, riskLevel } from '../game/risk.js';
 import { raidRate, checkAt, inZone } from '../game/pursuit.js';
-import { ASK, FORGE_CHEAP, canAsk, wanted, contactHere, shipWait, planeWait, shipRisk, planeRisk } from '../game/plan.js';
+import { ASK, FORGE_CHEAP, canAsk, wanted, contactHere, shipWait, planeWait, shipRisk, planeRisk, contactPrice } from '../game/plan.js';
 import { heatOf } from '../game/heat.js';
 import { lotValue, offerFor, robberyRisk, ROBBERY, LOAN } from '../game/money.js';
 import { I } from './icons.js';
@@ -39,12 +39,12 @@ export function renderSheet(id) {
 // ---------- Objetivo (resumen y noticias) ----------
 function objectives() {
   const cr = crime(), o = [];
-  if (cr.obj.includes('sell')) o.push([S.sold, `Vender las joyas en Sudamérica${S.lots < LOTS.joyas.count && !S.sold ? ` (quedan ${S.lots} lotes)` : ''}${S.fenceKnown.length ? ` · reducidor en ${S.fenceKnown.map((i) => CITY[i].n).join(', ')}` : ''}`]);
+  if (cr.obj.includes('sell')) o.push([S.sold, `Vender ${cr.goods} en Sudamérica${S.lots < cr.lot.count && !S.sold ? ` (quedan ${S.lots} lotes)` : ''}${S.fenceKnown.length ? ` · reducidor en ${S.fenceKnown.map((i) => CITY[i].n).join(', ')}` : ''}`]);
   const ready = S.passQ === 'top' || S.exit;
   o.push([!!ready, ready
     ? (S.exit ? `Salida contratada: ${CONTACTS[S.exit].exit.toLowerCase()} en ${CITY[S.contacts[S.exit].city].n}` : 'Tienes pasaporte de calidad: vuela desde un aeropuerto internacional')
     : 'Armar la salida: encuentra al capitán, al piloto o al falsificador (hoja Escape)']);
-  o.push([false, cr.obj.includes('deliver') ? `Salir del continente y entregar el óleo en ${CITY[S.buyer].n} (${COUNTRIES[CITY[S.buyer].c].n})` : 'Salir del continente sin que te atrapen']);
+  o.push([false, cr.obj.includes('deliver') ? `Salir del continente y entregar el óleo en ${CITY[S.buyer].n} (${COUNTRIES[CITY[S.buyer].c].n})` : cr.obj.includes('cross') ? `Cruzar la frontera y llegar a una casa segura fuera de Chile${S.safe.some((i) => CITY[i].c !== 'CL') ? ` (${S.safe.filter((i) => CITY[i].c !== 'CL').map((i) => CITY[i].n).join(', ')})` : ''}` : 'Salir del continente sin que te atrapen']);
   const extra = [];
   if (S.job) extra.push(`<span class="tag amber">${I.route}Paquete a ${esc(CITY[S.job.to].n)} · ${clock(S.job.deadline)}</span>`);
   if (S.loan) extra.push(`<span class="tag hot">${I.coins}Deuda ${money(S.loan.owe)} · ${clock(S.loan.due)}</span>`);
@@ -157,7 +157,7 @@ function plata() {
   let botin = '';
   if (S.lots > 0) {
     const v = lotValue();
-    botin += decision({ act: 'sellLot', icon: I.coins, title: `Vender ${esc(LOTS[cr.id].n)} en la calle`, desc: `A mitad de precio, sin reducidor. Quedan ${S.lots}.${cr.id === 'joyas' ? ' Si vendes todos, cumples el objetivo.' : ''}`, chipsHtml: chips({ h: 2, gain: v, riskText: 'El comprador puede hablar', riskLvl: 1 }), disabled: off() });
+    botin += decision({ act: 'sellLot', icon: I.coins, title: `Vender ${esc(cr.lot.n)} en la calle`, desc: `A mitad de precio, sin reducidor. Quedan ${S.lots}.${cr.kind === 'goods' ? ' Si vendes todos, cumples el objetivo.' : ''}`, chipsHtml: chips({ h: 2, gain: v, riskText: 'El comprador puede hablar', riskLvl: 1 }), disabled: off() });
   }
   botin += S.items.map((it, i) => decision({ act: 'sellItem', arg: i, icon: I.cash, title: `Vender ${esc(it.n.toLowerCase())}`, desc: it.risk ? 'Se puede rastrear hasta ti.' : 'No deja huella.', chipsHtml: chips({ h: 1, gain: it.v, riskText: it.risk ? 'Rastreable' : 'Limpio', riskLvl: it.risk > 0.15 ? 1 : 0 }), disabled: off() })).join('');
 
@@ -176,12 +176,13 @@ function plata() {
   ${botin ? group('Vender', botin) : ''}${group('Trabajos del bajo mundo', trabajos)}`;
 }
 
+const cr0 = () => crime();
 // ---------- Escape ----------
 const WHERE = {
   forger: 'Trabaja en una ciudad grande de Sudamérica.',
   captain: 'Opera desde un puerto del Pacífico o del Atlántico.',
   pilot: 'Vuela desde una zona remota: el norte, la Patagonia o Bolivia.',
-  fence: 'Compra joyas en alguna ciudad de Chile, Argentina, Perú o Bolivia.',
+  get fence() { return `Compra ${S && crime().gn ? crime().gn : 'joyas'} en alguna ciudad de Chile, Argentina, Perú o Bolivia.`; },
 };
 
 // Rumores agrupados: cuántas veces se repite cada lugar (los repetidos suelen ser ciertos)
@@ -203,21 +204,21 @@ const askBtn = (k) => decision({ act: 'ask', arg: k, icon: I.search, title: `Pre
 function contactCard(k) {
   const K = CONTACTS[k], ct = S.contacts[k], here = contactHere(k);
   let status, acts = '';
-  if (ct.found) status = `<div class="c-status ok">${I.pin}<span>${esc(K.n)} en <b>${esc(CITY[ct.city].n)}</b> · cobra ${money(K.price)}</span></div>`;
+  if (ct.found) status = `<div class="c-status ok">${I.pin}<span>${esc(K.n)} en <b>${esc(CITY[ct.city].n)}</b> · cobra ${money(contactPrice(k))}</span></div>`;
   else status = rumorLine(k) || `<div class="c-status">${I.search}<span>Nadie sabe dónde está. ${WHERE[k]}</span></div>`;
   if (!ct.found) acts += askBtn(k);
   else if (!here) acts += `<button type="button" class="btn ghost" data-act="goto" data-arg="${ct.city}">${I.route}Ver cómo llegar a ${esc(CITY[ct.city].n)}</button>`;
   else if (k === 'forger') {
     acts += S.passQ === 'top'
       ? `<p class="hint">Ya tienes su pasaporte. Vuela fuera del continente desde un aeropuerto internacional (Moverse → Mundo).</p>`
-      : decision({ act: 'forgeTop', primary: true, icon: I.id, title: 'Encargar el pasaporte de calidad', desc: 'Migraciones casi no lo nota. Con él puedes volar fuera del continente.', chipsHtml: chips({ h: K.hours, cost: K.price, riskText: 'Muy seguro', riskLvl: 0 }), disabled: broke(K.price), why: whyMoney(K.price) });
+      : decision({ act: 'forgeTop', primary: true, icon: I.id, title: 'Encargar el pasaporte de calidad', desc: 'Migraciones casi no lo nota. Con él puedes volar fuera del continente.', chipsHtml: chips({ h: K.hours, cost: contactPrice(k), riskText: 'Muy seguro', riskLvl: 0 }), disabled: broke(contactPrice(k)), why: whyMoney(contactPrice(k)) });
   } else if (!ct.paid) {
-    acts += decision({ act: 'hire', arg: k, primary: true, icon: I[K.icon], title: k === 'captain' ? 'Pagarle al capitán' : 'Pagarle al piloto', desc: k === 'captain' ? `El carguero zarpa en ${Math.round(shipWait())} h (dos veces por semana, a las 22:00).` : `La avioneta despega a las 03:00 (en ${Math.round(planeWait())} h).`, chipsHtml: chips({ cost: K.price }), disabled: broke(K.price), why: whyMoney(K.price) });
+    acts += decision({ act: 'hire', arg: k, primary: true, icon: I[K.icon], title: k === 'captain' ? 'Pagarle al capitán' : 'Pagarle al piloto', desc: k === 'captain' ? `El carguero zarpa en ${Math.round(shipWait())} h (dos veces por semana, a las 22:00).` : `La avioneta despega a las 03:00 (en ${Math.round(planeWait())} h).`, chipsHtml: chips({ cost: contactPrice(k) }), disabled: broke(contactPrice(k)), why: whyMoney(contactPrice(k)) });
   } else {
     const w = k === 'captain' ? shipWait() : planeWait(), p = k === 'captain' ? shipRisk() : planeRisk();
     const raid = raidOver(w, 0.04, false);
-    acts += decision({ act: 'leave', arg: k, primary: true, icon: I[K.icon], title: k === 'captain' ? '¡Embarcar en el carguero!' : '¡Subir a la avioneta!', desc: `Esperas escondido ${Math.round(w)} h y sales del continente.${checkAt(S.cur) ? ' Hay un control de McCuack en la ciudad: mejor esperar a que lo levanten.' : ''}${crime().id === 'joyas' && !S.sold ? ' Antes tienes que vender las joyas.' : ''}`,
-      chipsHtml: chips({ h: w, riskText: `Te atrapan ${Math.round(p * 100)}%${raid >= 0.01 ? ` · redada ${Math.round(raid * 100)}%` : ''}`, riskLvl: riskLevel(Math.max(p, raid)) }), disabled: off() || (crime().id === 'joyas' && !S.sold), why: crime().id === 'joyas' && !S.sold ? 'Primero vende las joyas' : '' });
+    acts += decision({ act: 'leave', arg: k, primary: true, icon: I[K.icon], title: k === 'captain' ? '¡Embarcar en el carguero!' : '¡Subir a la avioneta!', desc: `Esperas escondido ${Math.round(w)} h y sales del continente.${checkAt(S.cur) ? ' Hay un control de McCuack en la ciudad: mejor esperar a que lo levanten.' : ''}${crime().kind === 'goods' && !S.sold ? ` Antes tienes que vender ${crime().goods}.` : ''}`,
+      chipsHtml: chips({ h: w, riskText: `Te atrapan ${Math.round(p * 100)}%${raid >= 0.01 ? ` · redada ${Math.round(raid * 100)}%` : ''}`, riskLvl: riskLevel(Math.max(p, raid)) }), disabled: off() || (crime().kind === 'goods' && !S.sold), why: crime().kind === 'goods' && !S.sold ? `Primero vende ${crime().goods}` : '' });
   }
   return `<section class="exit-card${ct.found ? ' found' : ''}"><header><span class="ec-ico">${I[K.icon]}</span><div><b>${esc(K.exit)}</b><small>${esc(K.exitDesc)}</small></div></header>${status}${acts}</section>`;
 }
@@ -225,17 +226,17 @@ function contactCard(k) {
 function fenceCard() {
   const c = me();
   let acts = '';
-  if (S.fenceKnown.includes(c.id)) acts += decision({ act: 'sellFence', primary: true, icon: I.coins, title: `Vender las joyas al reducidor de ${esc(c.n)}`, desc: 'Paga cerca del 1,5% de su valor por los lotes que te quedan. Cumple el objetivo.', chipsHtml: chips({ h: 4, riskText: 'Puede caer en un operativo', riskLvl: 1 }), disabled: off() });
+  if (S.fenceKnown.includes(c.id)) acts += decision({ act: 'sellFence', primary: true, icon: I.coins, title: `Vender ${cr0().goods} al reducidor de ${esc(c.n)}`, desc: 'Paga cerca del 1,5% de su valor por los lotes que te quedan. Cumple el objetivo.', chipsHtml: chips({ h: 4, riskText: 'Puede caer en un operativo', riskLvl: 1 }), disabled: off() });
   else if (S.fenceKnown.length) acts += `<button type="button" class="btn ghost" data-act="goto" data-arg="${S.fenceKnown[0]}">${I.route}Ver cómo llegar a ${esc(CITY[S.fenceKnown[0]].n)}</button>`;
   else acts += askBtn('fence');
   const status = S.fenceKnown.length ? `<div class="c-status ok">${I.pin}<span>Reducidor en <b>${S.fenceKnown.map((i) => esc(CITY[i].n)).join(', ')}</b></span></div>` : rumorLine('fence') || `<div class="c-status">${I.search}<span>${WHERE.fence}</span></div>`;
-  return `<section class="exit-card${S.fenceKnown.length ? ' found' : ''}"><header><span class="ec-ico">${I.coins}</span><div><b>Vender las joyas</b><small>Sin vender las joyas no puedes salir. Un reducidor paga bien; en la calle, la mitad.</small></div></header>${status}${acts}</section>`;
+  return `<section class="exit-card${S.fenceKnown.length ? ' found' : ''}"><header><span class="ec-ico">${I.coins}</span><div><b>Vender ${cr0().goods}</b><small>Sin vender ${cr0().goods} no puedes salir. Un reducidor paga bien; en la calle, la mitad.</small></div></header>${status}${acts}</section>`;
 }
 
 function under() {
   const c = me(), cr = crime();
   let h = '';
-  if (cr.id === 'joyas' && !S.sold) h += fenceCard();
+  if (cr.kind === 'goods' && !S.sold) h += fenceCard();
   h += `<h3 class="g-title">Plan de escape · elige una salida</h3>`;
   h += ['forger', 'captain', 'pilot'].map(contactCard).join('');
   let extra = decision({ act: 'forgeCheap', icon: I.id, title: 'Comprar un pasaporte barato', desc: BIG.has(c.id) ? 'Sirve para moverte por Sudamérica con menos riesgo. En migraciones del extranjero se nota.' : 'Solo hay falsificadores de barrio en ciudades grandes.', chipsHtml: chips({ h: FORGE_CHEAP.hours, cost: FORGE_CHEAP.cost, riskText: 'A veces lo delatan', riskLvl: 1 }), disabled: !BIG.has(c.id) || S.id === 'fake' || broke(FORGE_CHEAP.cost), why: S.id === 'fake' ? 'Ya tienes pasaporte falso' : !BIG.has(c.id) ? 'No hay falsificadores aquí' : whyMoney(FORGE_CHEAP.cost) });

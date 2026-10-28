@@ -1,6 +1,7 @@
 // Plan de escape: rumores en el bajo mundo, contactos y las tres salidas del continente.
 import { CITIES, CITY, COUNTRIES, BIG, inSA } from '../data/geo.js';
-import { CONTACTS, LOTS, FENCE_RATE } from '../data/content.js';
+import { CONTACTS, FENCE_RATE } from '../data/content.js';
+import { skill } from './career.js';
 import { R, pick, money } from '../lib/util.js';
 import { S, crime, me } from './state.js';
 import { addTrace, news, pay, advance, after, caught, finish } from './engine.js';
@@ -9,18 +10,21 @@ import { maybeEvent } from './events.js';
 import { toast } from '../ui/render.js';
 
 export const ASK = { cost: 40000, hours: 3, truth: 0.75, trace: 0.1 };
+// Con Labia los rumores son más confiables; con Contactos, los contactos cobran menos
+const truthP = () => Math.min(0.96, ASK.truth + 0.07 * skill('labia'));
+export const contactPrice = (k) => Math.round((CONTACTS[k].price * (1 - 0.08 * skill('contactos'))) / 1000) * 1000;
 export const FORGE_CHEAP = { cost: 600000, hours: 10, burn: 0.14 };
 
 // Lo que se busca: los tres contactos y, en la joyería, un reducidor
 export function wanted() {
   const out = Object.keys(CONTACTS).filter((k) => !S.contacts[k].found);
-  if (crime().id === 'joyas' && !S.sold && !S.fenceKnown.length) out.push('fence');
+  if (crime().kind === 'goods' && !S.sold && !S.fenceKnown.length) out.push('fence');
   return out;
 }
 const cityOf = (k) => (k === 'fence' ? S.fences[0] : S.contacts[k].city);
 const levelOf = (k) => (k === 'fence' ? (S.fenceLvl || 0) : S.contacts[k].lvl);
 const setLevel = (k, v) => { if (k === 'fence') S.fenceLvl = v; else S.contacts[k].lvl = v; };
-export const contactName = (k) => (k === 'fence' ? 'un reducidor de joyas' : CONTACTS[k].short);
+export const contactName = (k) => (k === 'fence' ? `un reducidor de ${crime().gn}` : CONTACTS[k].short);
 
 export const canAsk = () => !S.over && S.askedAt[S.cur] !== S.path.length && S.cash >= ASK.cost;
 
@@ -39,12 +43,12 @@ export function askAround(k) {
   // ¿Hay alguien aquí?
   const here = [];
   for (const k of Object.keys(CONTACTS)) if (!S.contacts[k].found && S.contacts[k].city === c.id) here.push(k);
-  if (crime().id === 'joyas' && !S.sold && S.fences.includes(c.id) && !S.fenceKnown.includes(c.id)) here.push('fence');
+  if (crime().kind === 'goods' && !S.sold && S.fences.includes(c.id) && !S.fenceKnown.includes(c.id)) here.push('fence');
   if (here.length) {
     for (const k of here) {
       if (k === 'fence') S.fenceKnown.push(c.id);
       else { S.contacts[k].found = true; S.contacts[k].lvl = 2; }
-      news(S.hours, `En ${c.n} diste con ${contactName(k)}. ${k === 'fence' ? 'Compra las joyas.' : `Cobra ${money(CONTACTS[k].price)}.`}`, 'me');
+      news(S.hours, `En ${c.n} diste con ${contactName(k)}. ${k === 'fence' ? `Compra ${crime().goods}.` : `Cobra ${money(contactPrice(k))}.`}`, 'me');
     }
     toast(`¡Encontraste a ${contactName(here[0])}!`);
   } else rumor(c, false, k);
@@ -57,7 +61,7 @@ export function rumor(c, forceTrue = false, want) {
   const opts = wanted();
   if (!opts.length) { news(S.hours, `En ${c.n} nadie sabe nada nuevo.`, 'me'); return; }
   const k = opts.includes(want) ? want : pick(opts);
-  const truth = forceTrue || R() < ASK.truth;
+  const truth = forceTrue || R() < truthP();
   const real = CITY[cityOf(k)];
   let txt, country, city;
   if (truth) {
@@ -94,8 +98,8 @@ export function forgeCheap() {
 // Pasaporte de calidad del falsificador maestro
 export function forgeTop() {
   const K = CONTACTS.forger;
-  if (S.over || !contactHere('forger') || S.passQ === 'top' || S.cash < K.price) return;
-  pay(K.price);
+  if (S.over || !contactHere('forger') || S.passQ === 'top' || S.cash < contactPrice('forger')) return;
+  pay(contactPrice('forger'));
   S.contacts.forger.paid = true;
   advance(K.hours, { where: 'city', rate: 0.04 });
   if (S.over) return;
@@ -112,15 +116,15 @@ export function sellFence() {
   advance(4, { where: 'city', rate: 0.07 });
   S.awake += 4;
   if (S.over) return;
-  const gain = crime().lootVal * FENCE_RATE * (0.85 + R() * 0.3) * (S.lots / LOTS.joyas.count);
+  const gain = crime().lootVal * FENCE_RATE * (0.85 + R() * 0.3) * (S.lots / crime().lot.count);
   S.cash += gain; S.sold = true; S.lots = 0;
-  news(S.hours, `Vendiste las joyas al reducidor de ${me().n} por ${money(gain)}.`, 'me');
+  news(S.hours, `Vendiste ${crime().goods} al reducidor de ${me().n} por ${money(gain)}.`, 'me');
   if (R() < 0.2) addTrace(S.cur, 5, `El reducidor de ${me().n} cae en un operativo y entrega tu descripción.`);
   after();
 }
 
 // ---------- Salidas por carguero y avioneta ----------
-const now = () => 22 + S.hours;
+const now = () => (S.t0 ?? 22) + S.hours;
 // Horas que faltan para el próximo zarpe del capitán (22:00 de sus días)
 export function shipWait() {
   const t = now() % 168;
@@ -136,14 +140,14 @@ export function planeRisk() { return Math.min(0.95, 0.06 + S.heat / 400 + (check
 export const waitRaid = (h) => 1 - Math.pow(1 - raidRate(0.04, false) * 0.25, h / 0.25);
 
 export function canLeaveWithLoot() {
-  if (crime().id === 'joyas' && !S.sold) { toast('Primero tienes que vender las joyas.'); return false; }
+  if (crime().kind === 'goods' && !S.sold) { toast(`Primero tienes que vender ${crime().goods}.`); return false; }
   return true;
 }
 
 export function hireExit(k) {
   const K = CONTACTS[k], ct = S.contacts[k];
-  if (S.over || !contactHere(k) || ct.paid || S.cash < K.price) return;
-  pay(K.price);
+  if (S.over || !contactHere(k) || ct.paid || S.cash < contactPrice(k)) return;
+  pay(contactPrice(k));
   ct.paid = true;
   S.exit = k;
   news(S.hours, k === 'captain'
@@ -169,6 +173,6 @@ export function leave(k) {
   }
   const dest = S.buyer ? CITY[S.buyer].n : k === 'captain' ? 'Lisboa' : 'un pueblo de la selva brasileña';
   finish(true, k === 'captain'
-    ? `El carguero zarpó de ${c.n} con un pato escondido entre contenedores. ${cr.id === 'arte' ? `Semanas después entregaste el óleo en ${dest}.` : `Desembarcaste en ${dest} con otro nombre.`}`
-    : `La avioneta despegó a las 03:00 y voló bajo los radares. ${cr.id === 'arte' ? `Días después entregaste el óleo en ${dest}.` : `Amaneciste en ${dest}, lejos de McCuack.`}`);
+    ? `El carguero zarpó de ${c.n} con un pato escondido entre contenedores. ${cr.kind === 'art' ? `Semanas después entregaste el óleo en ${dest}.` : `Desembarcaste en ${dest} con otro nombre.`}`
+    : `La avioneta despegó a las 03:00 y voló bajo los radares. ${cr.kind === 'art' ? `Días después entregaste el óleo en ${dest}.` : `Amaneciste en ${dest}, lejos de McCuack.`}`);
 }

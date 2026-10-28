@@ -54,7 +54,7 @@ export const riskLevel = (p) => (p < 0.08 ? 0 : p < 0.2 ? 1 : 2);
 
 // ---------- Geografía ----------
 // Reloj del juego: la fuga empieza el lunes a las 22:00
-const now = () => 22 + S.hours;
+const now = () => (S.t0 ?? 22) + S.hours;
 const waitDaily = (h) => (h - (now() % 24) + 24) % 24;
 const waitWeekly = (day, h) => (day * 24 + h - (now() % 168) + 168) % 168;
 const DAY = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];

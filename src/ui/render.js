@@ -16,6 +16,7 @@ import { inZone, checkAt, zoneRadius } from '../game/pursuit.js';
 import { CONTACTS } from '../data/content.js';
 import { renderDigest } from './digest.js';
 import { music, musicLevel } from '../audio/sound.js';
+import { awakeMax } from '../game/engine.js';
 
 // Estado solo de interfaz (no forma parte de la partida)
 export const ui = { statsOpen: false, q: '', filter: 'cerca', lastShown: 0, game: null };
@@ -77,8 +78,8 @@ function renderStats() {
   <span class="st ${S.cash < 200000 ? 'bad' : ''}">${I.cash}<b>${shortMoney(S.cash)}</b><small>${ui.statsOpen ? money(S.cash) : 'Efectivo'}</small></span>
   <span class="st heat ${lvl}">${I.flame}<b>${heat}</b><small>Calor en ${esc(COUNTRIES[me().c].n)}</small><i class="bar"><i style="width:${heat}%"></i></i></span>
   <span class="st ${S.id === 'fake' ? 'good' : ''}">${I.id}<b>${S.id === 'fake' ? 'Falso' : 'Real'}</b><small>Documento</small></span>
-  <span class="st ${ip < 12 ? 'bad' : ''}">${I.globe}<b>${ip > 0 ? Math.ceil(ip) + ' h' : 'Activa'}</b><small>Interpol</small></span>
-  ${ui.statsOpen ? `<span class="st-more">${heatTable()}<span>${S.season === 'invierno' ? 'Invierno: pasos a Argentina cerrados en el centro y sur' : 'Verano: pasos cordilleranos abiertos'} · Despierto ${Math.round(S.awake)} h de 20 · ${disguised() ? 'Disfrazado' : 'Sin disfraz'} · Última pista de la PDI: ${S.police.known ? esc(CITY[S.police.known].n) : 'ninguna'}</span></span>` : ''}`;
+  <span class="st ${ip < 12 ? 'bad' : ''}">${I.globe}<b>${!isFinite(ip) ? 'No' : ip > 0 ? Math.ceil(ip) + ' h' : 'Activa'}</b><small>Interpol</small></span>
+  ${ui.statsOpen ? `<span class="st-more">${heatTable()}<span>${S.season === 'invierno' ? 'Invierno: pasos a Argentina cerrados en el centro y sur' : 'Verano: pasos cordilleranos abiertos'} · Despierto ${Math.round(S.awake)} h de ${awakeMax()} · ${disguised() ? 'Disfrazado' : 'Sin disfraz'} · Última pista de la PDI: ${S.police.known ? esc(CITY[S.police.known].n) : 'ninguna'}</span></span>` : ''}`;
 }
 
 // Calor de los países donde ya se habla de ti
@@ -101,7 +102,7 @@ function renderBanner() {
   else if ((S.alert[c.c] || -1) > S.hours) { msg = `Alerta en ${COUNTRIES[c.c].n}: controles reforzados por ${Math.ceil(S.alert[c.c] - S.hours)} h.`; kind = 'amber'; }
   else if (S.job && S.job.deadline - S.hours < 8) { msg = `Encargo: llega a ${CITY[S.job.to].n} antes de ${clock(S.job.deadline)} o la banda te delata.`; kind = 'amber'; }
   else if (S.loan && S.loan.due - S.hours < 16) { msg = `El usurero espera ${money(S.loan.owe)} antes de ${clock(S.loan.due)}.`; kind = 'amber'; }
-  else if (S.awake >= 16) { msg = `Llevas ${Math.round(S.awake)} h despierto. A las 20 te duermes donde estés.`; kind = 'amber'; }
+  else if (S.awake >= awakeMax() - 4) { msg = `Llevas ${Math.round(S.awake)} h despierto. A las ${awakeMax()} te duermes donde estés.`; kind = 'amber'; }
   b.hidden = !msg;
   b.className = `banner ${kind}`;
   b.innerHTML = msg ? `${I.warn}<span>${esc(msg)}</span>` : '';

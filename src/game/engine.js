@@ -11,9 +11,14 @@ import { render, toast } from '../ui/render.js';
 import { showEnd } from '../ui/screens.js';
 import { zoomMe } from '../ui/map.js';
 import { sfx, music } from '../audio/sound.js';
+import { skill, recordRun } from './career.js';
 
 // Un rastro se crea ahora y la policía lo descubre "delay" horas después
-export function addTrace(city, delay, txt) { S.traces.push({ city, at: S.hours + delay, txt, shown: false }); }
+// Con Sigilo, algunos rastros nunca llegan a la policía
+export function addTrace(city, delay, txt) {
+  if (R() < 0.1 * skill('sigilo')) return;
+  S.traces.push({ city, at: S.hours + delay, txt, shown: false });
+}
 export function news(t, x, cls) { S.news.push({ t, x, cls }); if (S.tab !== 'news') S.unread++; }
 
 // Pago en efectivo. Con billetes marcados, los pagos grandes pueden delatarte.
@@ -137,10 +142,13 @@ export function giveReward() {
   sfx('cash');
 }
 
+// Horas que aguantas sin dormir (más con Aguante)
+export const awakeMax = () => 20 + 2 * skill('aguante');
+
 export function caught(msg) { finish(false, msg); }
 
 function fatigue() {
-  if (S.awake >= 20 && !S.over) { toast('El cansancio te ganó: dormiste 8 horas en un hostal.'); rest('hostal', true); }
+  if (S.awake >= awakeMax() && !S.over) { toast('El cansancio te ganó: dormiste 8 horas en un hostal.'); rest('hostal', true); }
 }
 
 function canAfford() {
@@ -165,10 +173,8 @@ export function finish(win, msg) {
   const cr = crime();
   const pts = win ? Math.round(cr.lvl * 1000 + Math.max(0, S.cash) / 2000 + Math.max(0, 240 - S.hours) * 8) : 0;
   S.over = { win, msg, pts };
-  const car = store('fuga-career') || { escapes: 0, played: 0, points: 0 };
-  car.played++;
-  if (win) { car.escapes++; car.points += pts; }
-  store('fuga-career', car);
+  // Experiencia y rango de la carrera criminal
+  if (!S.sim) S.over.career = recordRun({ crimeId: cr.id, lvl: cr.lvl, days: S.days, win, clean: S.heist && S.heist.outcome === 'clean', pts });
   render();
   showEnd();
 }

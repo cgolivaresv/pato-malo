@@ -1,6 +1,5 @@
 // Acciones del prófugo: esconderse, bajo mundo y viajar.
 import { CITIES, CITY, COUNTRIES, BIG, inSA } from '../data/geo.js';
-import { LOTS } from '../data/content.js';
 import { R, pick, money } from '../lib/util.js';
 import { S, crime, me, disguised, interpol, policeHere } from './state.js';
 import { modes, exitRisk } from './risk.js';
@@ -113,13 +112,16 @@ export function travel(toId, k) {
   // Objetivos de salida
   const cr = crime();
   if (!inSA(to)) {
-    const goal = cr.id === 'arte' ? toId === S.buyer : cr.obj.includes('sell') ? S.sold : true;
+    const goal = cr.kind === 'art' ? toId === S.buyer : cr.obj.includes('sell') ? S.sold : true;
     if (goal) {
       if (R() < pExit) { caught(`Migraciones de ${to.n} te detuvo al pasar el control: ${realId ? 'tu documento real te delató' : S.passQ === 'top' ? 'hasta el mejor pasaporte tiene mala suerte' : 'el pasaporte barato no resistió la lupa'}.`); return; }
-      finish(true, cr.id === 'arte' ? `Entregaste el óleo al comprador en ${to.n}. Nadie volvió a saber de ti.` : `Pasaste migraciones en ${to.n} y desapareciste. Nadie volvió a saber de ti.`);
+      finish(true, cr.kind === 'art' ? `Entregaste el óleo al comprador en ${to.n}. Nadie volvió a saber de ti.` : `Pasaste migraciones en ${to.n} y desapareciste. Nadie volvió a saber de ti.`);
       return;
     }
-    toast(cr.id === 'arte' ? `El comprador no está en ${to.n}.` : 'Primero tienes que vender las joyas en Sudamérica.');
+    toast(cr.kind === 'art' ? `El comprador no está en ${to.n}.` : `Primero tienes que vender ${cr.goods} en Sudamérica.`);
+  } else if (cr.obj.includes('cross') && to.c !== 'CL' && S.safe.includes(toId)) {
+    finish(true, `Llegaste a la casa segura de ${to.n}, al otro lado de la frontera. Te fondeaste un mes y nadie volvió a preguntar por ti.`);
+    return;
   } else {
     toast(`Llegaste a ${to.n}.`);
     maybeEvent('travel', { mode: k, from: from.id, to: toId });

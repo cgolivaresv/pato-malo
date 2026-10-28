@@ -125,13 +125,13 @@ export const EVENTS = [
   },
   {
     id: 'perro', w: 3, mood: 'sorprendido', title: 'Perro detector',
-    when: (c) => c.kind === 'travel' && c.mode === 'air' && S.lots > 0 && crime().id !== 'camion',
+    when: (c) => c.kind === 'travel' && c.mode === 'air' && S.lots > 0 && crime().kind !== 'cash',
     text: () => 'En el aeropuerto, un perro detector se detiene frente a tu maleta y empieza a ladrar.',
     choices: () => [
       { label: 'Distraerlo con un sándwich', desc: 'Los perros también tienen hambre.', chips: { riskText: 'Revisan tu maleta 35%', riskLvl: 1 },
         run: () => { if (R() < 0.35) { traceHere(1, `Un perro detector en ${here()} encontró restos del botín en la maleta de un pato.`); heatHere(15); return 'El guía notó el truco. Alcanzaste a huir, pero sabrán que estuviste aquí.'; } return 'El perro se comió el sándwich feliz y se olvidó de ti.'; } },
       { label: 'Dejar parte del botín en el baño', desc: 'Pierdes una pieza, pero nadie te revisa.', chips: { riskText: 'Pierdes 1 pieza', riskLvl: 0 },
-        run: () => { S.lots--; if (crime().id === 'joyas' && S.lots <= 0) { S.lots = 0; S.sold = true; } return 'Dejaste una pieza detrás del estanque del baño. El perro siguió de largo.'; } },
+        run: () => { S.lots--; if (crime().kind === 'goods' && S.lots <= 0) { S.lots = 0; S.sold = true; } return 'Dejaste una pieza detrás del estanque del baño. El perro siguió de largo.'; } },
     ],
   },
   {

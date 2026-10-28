@@ -23,10 +23,12 @@ export function dist(a, b) {
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-// Hora del juego: la fuga empieza el lunes a las 22:00
+// Hora del juego: el golpe es el lunes; la hora depende del plan (22:00 por defecto)
 const DAYS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+let T0 = 22;
+export function setClockStart(h) { T0 = h; }
 export function clock(h) {
-  const t = 22 + h, d = Math.floor(t / 24), hh = Math.floor(t % 24), mm = Math.floor(((t % 1) * 60) / 15) * 15;
+  const t = T0 + h, d = Math.floor(t / 24), hh = Math.floor(t % 24), mm = Math.floor(((t % 1) * 60) / 15) * 15;
   return `${DAYS[d % 7]} ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
 }
 

@@ -9,8 +9,9 @@ const KEY = 'pato-tutorial-visto';
 
 function objectiveText() {
   const cr = crime();
-  if (cr.id === 'arte') return `llegar a ${CITY[S.buyer].n} (${COUNTRIES[CITY[S.buyer].c].n}) con el óleo y pasar migraciones`;
-  if (cr.id === 'joyas') return 'vender las joyas en Sudamérica y después salir del continente';
+  if (cr.kind === 'art') return `llegar a ${CITY[S.buyer].n} (${COUNTRIES[CITY[S.buyer].c].n}) con el óleo y pasar migraciones`;
+  if (cr.kind === 'goods') return `vender ${cr.goods} en Sudamérica y después salir del continente`;
+  if (cr.obj.includes('cross')) return 'cruzar la frontera y esconderme en una casa segura fuera de Chile';
   return 'salir de Sudamérica y pasar migraciones en una capital del mundo';
 }
 

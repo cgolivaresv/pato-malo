@@ -1,6 +1,7 @@
 // Formas de conseguir dinero: botín, tus cosas, encargos, asaltos y usurero.
 import { CITIES, CITY, CONO, inSA } from '../data/geo.js';
-import { LOTS, FENCE_RATE } from '../data/content.js';
+import { FENCE_RATE } from '../data/content.js';
+import { skill } from './career.js';
 import { R, pick, dist, money } from '../lib/util.js';
 import { S, crime, me, disguised } from './state.js';
 import { addTrace, news, advance, after, caught } from './engine.js';
@@ -9,7 +10,7 @@ import { render } from '../ui/render.js';
 // Precio de un lote vendido en la calle (mitad de lo que pagaría un reducidor)
 export function lotValue() {
   const cr = crime();
-  return cr.id === 'joyas' ? (cr.lootVal * FENCE_RATE) / LOTS.joyas.count / 2 : LOTS[cr.id].val / 2;
+  return cr.kind === 'goods' ? (cr.lootVal * FENCE_RATE) / cr.lot.count / 2 : cr.lot.val / 2;
 }
 
 export function sellLot() {
@@ -21,9 +22,9 @@ export function sellLot() {
   const gain = lotValue() * (0.85 + R() * 0.3);
   S.cash += gain;
   S.lots--;
-  if (cr.id === 'joyas' && S.lots === 0) S.sold = true;
-  news(S.hours, `Vendiste ${LOTS[cr.id].n} en la calle de ${c.n} por ${money(gain)}, la mitad de lo que vale.`, 'me');
-  if (R() < (cr.marked ? 0.35 : 0.25)) addTrace(c.id, 4 + R() * 6, `Aparece en ${c.n} parte del botín: ${LOTS[cr.id].n.replace(/^una? /, '')}. La PDI interroga al comprador.`);
+  if (cr.kind === 'goods' && S.lots === 0) S.sold = true;
+  news(S.hours, `Vendiste ${cr.lot.n} en la calle de ${c.n} por ${money(gain)}, la mitad de lo que vale.`, 'me');
+  if (R() < (cr.marked ? 0.35 : 0.25)) addTrace(c.id, 4 + R() * 6, `Aparece en ${c.n} parte del botín: ${cr.lot.n.replace(/^una? /, '')}. La PDI interroga al comprador.`);
   after();
 }
 

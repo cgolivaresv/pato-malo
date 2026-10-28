@@ -4,6 +4,7 @@ import { CITY } from '../data/geo.js';
 import { esc } from '../lib/util.js';
 import { S, disguised, policeHere } from '../game/state.js';
 import { checkAt, inZone } from '../game/pursuit.js';
+import { awakeMax } from '../game/engine.js';
 
 const EXPR = import.meta.glob('../assets/pato/*.webp', { eager: true, import: 'default' });
 // Algunos estados de ánimo comparten cara pero tienen frases propias
@@ -141,7 +142,7 @@ export function moodOf() {
   if (checkAt(S.cur)) return 'control';
   if (alert && S.heat >= 45) return 'alerta';
   if (inZone(c)) return 'zona';
-  if (S.awake >= 16) return 'cansado';
+  if (S.awake >= awakeMax() - 4) return 'cansado';
   if (S.reward && S.reward.day === S.days && S.hours - S.days * 24 < 3) return 'feliz';
   if (S.cash < 200000) return 'pobre';
   if (disguised()) return 'guino';

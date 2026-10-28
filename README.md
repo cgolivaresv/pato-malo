@@ -6,14 +6,17 @@ Juego de escape en el navegador. Acabas de dar un golpe en una ciudad de Chile y
 
 ## Cómo se juega
 
-1. Elige un golpe: camión de valores, joyería u óleo colonial. Cada uno tiene un objetivo distinto.
-2. Arma un **plan de escape**: pregunta en el bajo mundo por un capitán de carguero, un piloto de avioneta o un falsificador maestro. Los rumores pueden ser falsos; los que se repiten suelen ser ciertos.
-3. Muévete por el mapa en bus, avión, paso clandestino o barco, esquivando los controles y la zona de búsqueda de McCuack.
-4. Escóndete, cambia de aspecto, compra un pasaporte barato para moverte o paga a un soplón.
-5. Consigue dinero vendiendo tus cosas o parte del botín, haciendo encargos para bandas, asaltando o pidiendo al usurero.
-6. Sal del continente: en el carguero, en la avioneta o en un vuelo comercial con el pasaporte de calidad.
+1. Elige un golpe. Hay ocho, de menor a mayor dificultad: lanzazo en el Persa Biobío, bomba de bencina en la Ruta 5, casa de cambio, camión de valores, joyería, óleo colonial, casino de Viña y lingotes del Banco Central; los grandes se desbloquean con experiencia.
+2. **Planea el golpe** en cinco pasos: reconocimiento, equipo (chofer, hacker, campana), horario, herramientas y cómo te vas del lugar. Cada opción muestra su costo y cómo cambia la probabilidad de que salga limpio, con testigos o con la alarma sonando.
+3. Da el golpe: el resultado fija cómo empieza la fuga (botín, horas antes de la alarma, calor, rastros y desde qué ciudad partes).
+4. Huye. En los golpes chicos basta con llegar a una casa segura fuera de Chile; en los grandes hay que armar un **plan de escape** con un capitán de carguero, un piloto de avioneta o un falsificador maestro, siguiendo rumores que pueden ser falsos.
+5. Muévete por el mapa en bus, avión, paso clandestino o barco, esquivando los controles y la zona de búsqueda de McCuack. Escóndete, disfrázate, consigue plata y sal del continente.
+6. Gana experiencia, sube de rango (Ratero, Lanza, Choro, Capo, Leyenda) y mejora habilidades en tu **prontuario**.
 
 ## Lo que lo hace distinto
+
+- **Carrera criminal.** Experiencia por cada golpe, día libre y fuga exitosa (algo se gana aunque te atrapen). Cinco rangos desbloquean golpes nuevos. Cada rango y cada fuga dan un punto de habilidad: Sigilo (rastros que nunca aparecen), Labia (rumores más confiables), Contactos (más casas seguras y contactos más baratos), Manos rápidas (más botín) y Aguante (más horas sin dormir). Se guarda en el navegador.
+- **Planificación del golpe.** Decisiones con costo y riesgo a la vista; el equipo cobra su parte y puede sapearte durante la fuga.
 
 - **Plan de escape.** Tres salidas, cada una con un contacto escondido que hay que encontrar siguiendo rumores. Volar directo con tu documento real casi nunca funciona: migraciones te espera.
 - **Rastros con retraso.** Cada acción puede dejar una huella que la policía descubre horas después.
@@ -40,7 +43,7 @@ npm run build    # genera la versión publicable en dist/
 
 Cada vez que se sube un cambio a `main`, GitHub Actions compila el juego y lo publica en GitHub Pages.
 
-Para medir el balance, con `npm run dev` abre `/pato-malo/sim/` y ejecuta `runSim(120)` en la consola: juega fugas automáticas con varias estrategias y muestra cuánto gana cada una. El simulador no se publica. Con la versión 0.8.0, volar directo gana entre 3 y 11% de las veces, el pasaporte barato entre 4 y 21%, y los planes completos del simulador entre 21 y 53% (una persona jugando con cuidado debería ganar más).
+Para medir el balance, con `npm run dev` abre `/pato-malo/sim/` y ejecuta `runSim(120)` en la consola: juega fugas automáticas con varias estrategias y muestra cuánto gana cada una. El simulador no se publica. Con la versión 0.11.0 y el plan de golpe por defecto, el simulador gana entre 80 y 90% de los golpes chicos (lanzazo y bomba de bencina), entre 30 y 45% de la casa de cambio, alrededor de 28% del camión, y entre 13 y 25% de la joyería, el óleo, el casino y la bóveda. Volar directo con documento real sigue fallando casi siempre. Una persona jugando con cuidado debería ganar más.
 
 ## Estructura
 
@@ -52,7 +55,7 @@ src/
   data/
     places.js         Países y 70 ciudades con coordenadas
     geo.js            Agrupaciones: Sudamérica, ciudades grandes, aeropuertos, fronteras
-    content.js        Golpes, botín, objetos iniciales y recompensas
+    content.js        Golpes, rangos, habilidades, opciones de planificación, botín y recompensas
     map.json          Contornos de cada país ya proyectados, con punto para su nombre
   lib/util.js         Utilidades (distancias, reloj, formato de dinero)
   game/               Lógica: no depende de la interfaz
@@ -63,6 +66,8 @@ src/
     money.js          Formas de conseguir dinero
     heat.js           Calor por país
     plan.js           Plan de escape: rumores, contactos y salidas
+    heist.js          Planificación y resultado del golpe
+    career.js         Experiencia, rangos, golpes desbloqueados y habilidades
     pursuit.js        Zona de búsqueda, controles y riesgo de redada
     events.js         Eventos con decisiones
   ui/                 Interfaz
@@ -73,6 +78,7 @@ src/
     icons.js          Iconos SVG
     screens.js        Elegir golpe, informe y resultado
     digest.js         Parte de novedades después de cada acción
+    heistui.js        Escalera de golpes, planificación, resultado del golpe y prontuario
     events.js         Manejador único de clics (data-act / data-arg)
   assets/pato/        Ilustración y 8 expresiones del pato (WebP, fondo limpio)
   assets/detective/   Ilustración y 6 expresiones del detective McCuack

@@ -1,6 +1,5 @@
 // Ventanas superpuestas: elegir golpe, informe del golpe y resultado.
 import { CITY } from '../data/geo.js';
-import { CRIMES } from '../data/content.js';
 import { $, esc, money, clock, store } from '../lib/util.js';
 import { S, setS, newGame, crime, me } from '../game/state.js';
 import { news } from '../game/engine.js';
@@ -14,6 +13,7 @@ import { currentEvent, eventChoices } from '../game/events.js';
 import { decision, chips } from './components.js';
 import { maybeTutorial } from './tutorial.js';
 import { sfx, music } from '../audio/sound.js';
+import { showCrimes, takeHeist, xpBlock } from './heistui.js';
 
 const ov = () => $('#ov');
 const modal = (label, inner, cls = '') => `<div class="modal ${cls}" role="dialog" aria-modal="true" aria-label="${label}"><div class="tape" aria-hidden="true"></div><div class="in">${inner}</div></div>`;
@@ -22,53 +22,30 @@ export function closeOv() { ov().hidden = true; ov().innerHTML = ''; ov().datase
 
 const STARS = (n) => `<span class="lvl" aria-label="Dificultad ${n} de 5">${'<i class="on"></i>'.repeat(n)}${'<i></i>'.repeat(5 - n)}</span>`;
 
-export function showCrimes() {
-  const car = store('fuga-career') || { escapes: 0, played: 0, points: 0 };
-  ov().hidden = false;
-  ov().innerHTML = modal('Elegir golpe', `
-  <div class="hero">
-    <div class="hero-txt">
-      <div class="file-no">Expediente N.º ${String(car.played + 1).padStart(4, '0')} · ${car.escapes}/${car.played} fugas · ${car.points.toLocaleString('es-CL')} pts</div>
-      <h1>Pato<br>Malo</h1>
-      <p class="hero-quip">«Nadie atrapa a un pato con estilo.»</p>
-    </div>
-    <img class="hero-pato" src="${PATO}" alt="Pato Malo con gorra, lentes oscuros y chaqueta de cuero" width="299" height="514">
-  </div>
-  <p class="lead">Acabas de dar el golpe en Chile. Cada cosa que haces puede dejar un rastro que la policía descubre horas después, y la brigada viaja al último lugar donde supo de ti.</p>
-  <div class="rival"><img src="${MCCUACK}" alt="${DET_NAME}, con sombrero fedora, lentes oscuros y gabardina" width="90" height="149"><div><div class="file-no">Te persigue</div><b>${DET_NAME}</b><p>Jefe de la Brigada de Robos. Nunca duerme y nunca olvida una pista.</p><p class="rival-motto">«${MOTTO}»</p></div></div>
-  <details class="rules"><summary>Cómo se juega</summary><ul>
-    <li><b>No basta con tomar un avión.</b> Para salir del continente necesitas un plan: encontrar al capitán de un carguero, al piloto de una avioneta o a un falsificador maestro. Pregunta en el bajo mundo; los rumores pueden ser falsos.</li>
-    <li>Cada cosa que haces puede dejar un <b>rastro</b> que la PDI descubre horas después. Ahí McCuack abre una zona de búsqueda e instala controles en las ciudades cercanas. Los ves en el mapa.</li>
-    <li>Volar con tu documento real los lleva directo a ti. El bus dentro del país es silencioso; los controles, aeropuertos y fronteras son el peligro.</li>
-    <li>El <b>calor</b> de cada país sube con los rastros y baja cuando te escondes. Si la brigada llega a tu ciudad, muévete.</li>
-    <li>En el camino pasan cosas: cada evento te deja elegir, y cada opción muestra lo que arriesgas.</li>
-    <li>¿Sin plata? Vende tus cosas o parte del botín, haz encargos, asalta o pide al usurero. Todo deja huella.</li>
-  </ul></details>
-  <h2 class="pick">Elige el golpe</h2>
-  <div class="crimes">${CRIMES.map((c) => `<button class="crime" type="button" data-act="start" data-arg="${c.id}">${STARS(c.lvl)}<b>${c.n}</b><span>${c.d}</span><span class="meta">${I.cash}${money(c.cash)} ${I.globe}Interpol ${c.interpol} h</span></button>`).join('')}</div>
-  ${S && !S.over ? '<div class="act-row"><button class="btn ghost" type="button" data-act="closeOv">Volver a la fuga</button></div>' : ''}`, 'start');
-}
+export { showCrimes };
 
-// Fuga que seguía en curso cuando se eligió un golpe nuevo: se recupera si el jugador vuelve atrás
-let prevGame = null;
-export function startGame(id) {
-  prevGame = S && !S.over ? S : null;
-  setS(newGame(id));
+// Empieza la fuga con el golpe recién dado (planGo en heistui.js)
+export function startGame() {
+  const h = takeHeist();
+  if (!h) { showCrimes(); return; }
+  setS(newGame(h.id, h.setup));
   const cr = crime(), c = me();
-  news(0, `Golpe consumado en ${c.n}: ${cr.loot}. Tienes ${cr.alarm} h antes de que suene la alarma.`, 'me');
+  const st = CITY[S.start];
+  news(0, `Golpe ${S.heist.outcome === 'clean' ? 'limpio' : S.heist.outcome === 'witness' ? 'con testigos' : 'con la alarma sonando'} en ${st.n}: ${cr.loot}. La alarma suena en ${cr.alarm} h.`, 'me');
+  if (S.cur !== S.start) news(S.hours, `Escapaste del lugar y llegaste a ${c.n}.`, 'me');
   news(0, `Tu red tiene casas seguras en ${S.safe.map((i) => CITY[i].n).join(', ')}.`, 'me');
   if (S.buyer) news(0, `El comprador del óleo te espera en ${CITY[S.buyer].n}.`, 'me');
   S.unread = 0; // el informe ya lo cuenta
   ov().innerHTML = modal('El golpe', `
-  <div class="file-no">${clock(0)} · ${esc(c.n)} · Informe reservado</div>
+  <div class="file-no">${clock(S.hours)} · ${esc(c.n)} · Informe reservado</div>
   <h1>${esc(cr.n)}</h1>
   <div class="pato-bubble"><img class="pato-face" src="${face('burlo')}" alt="" width="56" height="56"><p>${esc(quip('burlo'))}</p></div>
-  <p class="lead">Saliste de ${esc(c.n)} con <b>${esc(cr.loot)}</b> y ${money(cr.cash)} en efectivo. La alarma suena en ${cr.alarm} ${cr.alarm === 1 ? 'hora' : 'horas'}.</p>
+  <p class="lead">Saliste de ${esc(st.n)} con <b>${esc(cr.loot)}</b> y ${money(cr.cash)} en efectivo.${S.cur !== S.start ? ` Ya estás en <b>${esc(c.n)}</b>.` : ''} ${cr.alarm <= S.hours ? 'La alarma ya está sonando.' : `La alarma suena a las ${clock(cr.alarm).split(' ')[1]}.`}</p>
   <p>${esc(cr.d)}</p>
-  <p class="hint">Para salir del continente arma tu plan en la hoja <b>Escape</b>: busca al capitán, al piloto o al falsificador maestro.</p>
-  <dl class="facts"><dt>${I.house}Casas seguras</dt><dd>${S.safe.map((i) => esc(CITY[i].n)).join(', ')}</dd>${S.buyer ? `<dt>${I.pin}Comprador</dt><dd>${esc(CITY[S.buyer].n)}</dd>` : ''}<dt>${I.globe}Interpol</dt><dd>en ${cr.interpol} h</dd><dt>${S.season === 'invierno' ? I.snow : I.sun}Estación</dt><dd>${S.season === 'invierno' ? 'Invierno: la nieve cierra los pasos a Argentina en el centro y sur' : 'Verano: los pasos cordilleranos están abiertos'}</dd></dl>
+  <p class="hint">${cr.obj.includes('cross') ? `Cruza la frontera y llega a una casa segura fuera de Chile: <b>${S.safe.filter((i) => CITY[i].c !== 'CL').map((i) => esc(CITY[i].n)).join(', ')}</b>.` : 'Para salir del continente arma tu plan en la hoja <b>Escape</b>: busca al capitán, al piloto o al falsificador maestro.'}</p>
+  <dl class="facts"><dt>${I.house}Casas seguras</dt><dd>${S.safe.map((i) => esc(CITY[i].n)).join(', ')}</dd>${S.buyer ? `<dt>${I.pin}Comprador</dt><dd>${esc(CITY[S.buyer].n)}</dd>` : ''}<dt>${I.globe}Interpol</dt><dd>${isFinite(cr.interpol) ? `en ${cr.interpol} h` : 'No entra al caso'}</dd><dt>${S.season === 'invierno' ? I.snow : I.sun}Estación</dt><dd>${S.season === 'invierno' ? 'Invierno: la nieve cierra los pasos a Argentina en el centro y sur' : 'Verano: los pasos cordilleranos están abiertos'}</dd></dl>
   <div class="det-bubble"><p><b>McCuack</b> ${esc(detQuip('inicio'))}</p><img class="det-face" src="${detFace('serio')}" alt="" width="56" height="56"></div>
-  <div class="act-row"><button class="btn big" type="button" data-act="begin">Empezar la fuga</button><button class="btn ghost" type="button" data-act="backCrimes">Elegir otro golpe</button></div>`, 'brief');
+  <div class="act-row"><button class="btn big" type="button" data-act="begin">Empezar la fuga</button></div>`, 'brief');
   render();
 }
 
@@ -84,18 +61,11 @@ export function showEnd() {
   <p class="lead">${esc(o.msg)}</p>
   ${detBubble()}
   <dl class="facts"><dt>${I.route}Recorrido</dt><dd>${S.path.map((i) => esc(CITY[i].n)).join(' → ')}</dd><dt>${I.target}Rastros descubiertos</dt><dd>${S.traces.filter((t) => t.shown).length}</dd><dt>${I.cash}Efectivo final</dt><dd>${money(Math.max(0, S.cash))}</dd>${o.win ? `<dt>${I.gift}Puntaje</dt><dd><b>${o.pts.toLocaleString('es-CL')}</b></dd>` : ''}</dl>
+  ${xpBlock(o.career)}
   <div class="act-row"><button class="btn big" type="button" data-act="crimes">Otro golpe</button><button class="btn ghost" type="button" data-act="viewMap">Ver el recorrido</button></div>`, o.win ? 'end win' : 'end lose');
 }
 
-// Desde el informe: descarta este golpe y vuelve a la lista
-export function backToCrimes() {
-  setS(prevGame);
-  prevGame = null;
-  render();
-  showCrimes();
-}
-
-export function begin() { prevGame = null; closeOv(); render(); zoomMe(); setTimeout(maybeTutorial, 700); }
+export function begin() { closeOv(); render(); zoomMe(); setTimeout(maybeTutorial, 700); }
 
 // Ventana de evento: situación, opciones con su costo y riesgo, y luego el resultado
 export function showEvent() {
