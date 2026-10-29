@@ -806,6 +806,8 @@ a { color: var(--sodium); }
 .hz-a.ghost { background: transparent; }
 .hz-a:disabled { opacity: .45; }
 .hz-a:not(:disabled):active { transform: scale(.97); }
+.hz-panel > * { flex-shrink: 0; }
+.pm .hz-panel { max-height: 36vh; }
 .hz-help summary { font-family: var(--f-label); font-size: 13px; color: var(--muted); cursor: pointer; }
 .hz-help p { margin: 6px 0 0; font-size: 13px; color: var(--muted); line-height: 1.4; }
 @media (min-width: 920px) {
@@ -816,3 +818,51 @@ a { color: var(--sodium); }
   .hz-board { grid-column: 1; grid-row: 3; padding: 0 12px 12px; }
   .hz-panel { grid-column: 2; grid-row: 3; max-height: none; border-top: 0; border-left: 1px solid var(--line); }
 }
+
+/* ---------- Preparación: mapa simulado de la ciudad ---------- */
+.pm { z-index: 25; }
+.pm-board { position: relative; }
+.pm-land { fill: #57505e; }
+.pm-sea { fill: #1f4f73; }
+.pm-wave { fill: #8fc4ea88; pointer-events: none; }
+.pm-block { fill: #3a3342; stroke: #2a2430; stroke-width: 1; }
+.pm-block.park { fill: #2f4d37; }
+.pm-block.plaza { fill: #3d6145; }
+.pm-block.hill { fill: #5b4a3c; }
+.pm-tree { pointer-events: none; }
+.pm-river { fill: #2a6a95; opacity: .9; }
+.pm-street { stroke: #6b6372; stroke-width: 7; stroke-linecap: round; }
+.pm-route { fill: none; stroke: var(--sodium); stroke-width: 2.4; stroke-dasharray: 5 4; stroke-linecap: round; animation: dash 1s linear infinite; pointer-events: none; }
+@keyframes dash { to { stroke-dashoffset: -18; } }
+.pm-win { fill: #ffd27a; opacity: .85; pointer-events: none; }
+.pm-pl { cursor: pointer; }
+.pm-pl circle { fill: #1d1922; stroke: #a99fa9; stroke-width: 1.4; }
+.pm-pl.tgt circle { stroke: var(--bad); stroke-width: 2; }
+.pm-pl.on circle { stroke: var(--sodium); stroke-width: 2.6; fill: #3a2716; }
+.pm-pl.closed circle { fill: #2a2630; }
+.pm-pl.closed > text:not(.pm-lbl):not(.pm-lock) { opacity: .55; }
+.pm-lbl { fill: #f3ede4; font-family: var(--f-label); font-weight: 700; paint-order: stroke; stroke: #121016; stroke-width: 2.6; pointer-events: none; }
+.pm-lock { pointer-events: none; }
+.pm-me { transition: transform .13s linear; pointer-events: none; }
+.pm-me circle { fill: var(--paper-2); stroke: var(--sodium); stroke-width: 2; }
+.pm-mcc { pointer-events: none; filter: drop-shadow(0 0 3px #4aa8ff); }
+.pm-night { fill: #0b1030; opacity: .45; pointer-events: none; }
+.pm-night.dusk { fill: #3a1d40; opacity: .22; }
+.pm-rain { fill: url(#pmRainP); pointer-events: none; }
+.pm-busy { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); background: var(--paper) var(--noise); border: 1px solid var(--sodium); border-radius: 12px; padding: 8px 14px; display: flex; flex-direction: column; align-items: center; gap: 3px; box-shadow: 0 10px 30px #000b; min-width: 180px; z-index: 2; }
+.pm-busy[hidden] { display: none; }
+.pm-busy b { font-size: 14px; text-align: center; }
+.pm-busy small { color: var(--muted); font-family: var(--f-mono); font-size: 12px; }
+.pm-bar { display: block; width: 100%; height: 4px; border-radius: 2px; background: #ffffff1a; overflow: hidden; }
+.pm-bar i { display: block; height: 100%; width: 100%; background: var(--sodium); transform-origin: left; animation: pmFill 1s linear forwards; }
+@keyframes pmFill { from { transform: scaleX(0); } }
+.pm-place { display: flex; gap: 10px; align-items: flex-start; }
+.pm-ic { font-size: 26px; line-height: 1; flex: none; }
+.pm-place b { font-size: 16px; }
+.pm-place small { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+.pm-place .pm-dist { color: var(--sodium); margin-top: 2px; }
+.pm-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+.pm-chips i { font-style: normal; font-family: var(--f-mono); font-size: 11px; background: #ffffff10; border-radius: 5px; padding: 1px 5px; color: var(--ink); }
+.pm-chips i.sus { background: #ff9a3c22; color: var(--sodium); }
+.pm-info { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--muted); line-height: 1.35; border-top: 1px solid var(--line); padding-top: 6px; }
+.pm-info b { color: var(--ink); }

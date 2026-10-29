@@ -7,6 +7,7 @@ import { S } from '../game/state.js';
 import { career, rankOf, rankName, nextRank, unlocked, buySkill, MAX_SKILL_LVL, crewInfo, afterHeist, recordRun } from '../game/career.js';
 import { newPrep, member, prepCost, prepItemCost, crewCut, suspicion, mccChance, startBoard, toSetup, contractText } from '../game/heist.js';
 import { openBoard } from './boardui.js';
+import { openPrepMap, closePrepMap } from './prepmapui.js';
 import { I } from './icons.js';
 import { PATO, face, quip } from './pato.js';
 import { MCCUACK, DET_NAME, MOTTO, detFace } from './detective.js';
@@ -41,6 +42,7 @@ export function careerCard(c = career()) {
 // ---------- Elegir golpe ----------
 export function showCrimes() {
   P = null;
+  closePrepMap();
   const c = career();
   ov().hidden = false;
   ov().innerHTML = modal('Elegir golpe', `
@@ -75,14 +77,21 @@ export function showCrimes() {
 // ---------- Preparación del golpe ----------
 let P = null;
 export const currentPrep = () => P;
-export function reopenPrep() { if (P) showPrep(); else showCrimes(); }
+export function reopenPrep() { if (P) openPrepMap(P, golpeFromMap, showCrimes); else showCrimes(); }
 
 export function startPrep(id) {
   const cr = CRIMES.find((c) => c.id === id);
   if (!cr || !unlocked(cr)) return;
   P = newPrep(id);
   P.sunk = 0;
-  showPrep();
+  closeOv();
+  openPrepMap(P, golpeFromMap, showCrimes);
+}
+
+// Desde el mapa de la ciudad: al lugar del golpe. McCuack ronda si te vio o si la sospecha es alta.
+function golpeFromMap(prep) {
+  const mcc = prep.mccSeen || R() < mccChance(prep) * 0.4;
+  openBoard(prep, startBoard(prep, mcc), onBoardEnd);
 }
 
 export function prepSet(arg) {

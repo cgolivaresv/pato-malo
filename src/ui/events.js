@@ -13,6 +13,7 @@ import { destList } from './sheets.js';
 import { showCrimes, startGame, closeOv, begin } from './screens.js';
 import { startPrep, prepSet, prepGo, mccSwap, mccStay, showCareer, skillUp } from './heistui.js';
 import { boardTap, boardAct, boardBack } from './boardui.js';
+import { pmSelect, pmDo, pmQuit } from './prepmapui.js';
 import { zoomMe, zoomWorld, zoomBy } from './map.js';
 import { playTravel, hideStamp } from './fx.js';
 import { I } from './icons.js';
@@ -25,7 +26,7 @@ import { unlock, sfx, cycleSound, soundMode } from '../audio/sound.js';
 const SOUND_OF = {
   sheet: (a) => (S && S.tab === a ? 'close' : 'open'), closeSheet: 'close', closeOv: 'close', digestOk: 'close',
   rest: 'rest', lowProfile: 'rest', disguise: 'swish', soplon: 'ask', ask: 'ask',
-  forgeCheap: 'paper', forgeTop: 'paper', start: 'paper', crimes: 'paper', prepSet: 'tap', prepGo: 'paper', mccSwap: 'tap', mccStay: 'siren', hzCell: null, hzAct: null, hzBack: 'close', heistGo: 'siren', careerOpen: 'paper', skillUp: null, begin: 'tap',
+  forgeCheap: 'paper', forgeTop: 'paper', start: 'paper', crimes: 'paper', prepSet: 'tap', prepGo: 'paper', mccSwap: 'tap', mccStay: 'siren', hzCell: null, hzAct: null, hzBack: 'close', pmSel: null, pmDo: null, pmQuit: 'close', heistGo: 'siren', careerOpen: 'paper', skillUp: null, begin: 'tap',
   sellFence: 'cash', sellLot: 'cash', sellItem: 'cash', acceptJob: 'cash', robbery: 'cash', borrow: 'cash', repay: 'cash', hire: 'cash',
   leave: (k) => (k === 'captain' ? 'ship' : 'air'), eventChoice: 'resolve', surrender: 'deny',
   travel: null, sound: null, titleSkip: null,
@@ -46,6 +47,9 @@ const ACTIONS = {
   prepGo: () => prepGo(),
   mccSwap: () => mccSwap(),
   mccStay: () => mccStay(),
+  pmSel: (a) => pmSelect(a),
+  pmDo: (a) => pmDo(a),
+  pmQuit: () => pmQuit(),
   hzCell: (a) => boardTap(a),
   hzAct: (a) => boardAct(a),
   hzBack: () => boardBack(),

@@ -113,6 +113,7 @@ export function execute(id, plan = defaultPlan()) {
 // Golpe táctico: preparación y paso al plano (board.js)
 // =====================================================================
 
+const hourOfDay = (h) => h % 24;
 const weighted = (list) => { const t = list.reduce((a, x) => a + (x.w || 1), 0); let r = R() * t; for (const x of list) { r -= x.w || 1; if (r <= 0) return x; } return list[0]; };
 
 // Nueva preparación: ciudad al azar, imprevisto del día, encargo y equipo disponible
@@ -160,6 +161,7 @@ export function suspicion(P) {
   let s = P.memory * 10;
   for (const p of PREP) if (P.prep.has(p.id)) s += p.sus;
   s += Object.values(P.crew).filter(Boolean).length * 4;
+  s += P.susExtra || 0; // vigilar, cavar, dormirse en la calle, toparse con McCuack
   return Math.min(100, s);
 }
 export const mccChance = (P) => Math.max(0, (suspicion(P) - 30) / 100) * 1.4;
@@ -168,10 +170,11 @@ export const mccChance = (P) => Math.max(0, (suspicion(P) - 30) / 100) * 1.4;
 export function startBoard(P, mcc) {
   const notes = [];
   let tunnelCollapsed = false;
-  if (P.prep.has('tunel') && R() < PREP.find((p) => p.id === 'tunel').collapse) { tunnelCollapsed = true; notes.push('El túnel se derrumbó la última noche: perdiste lo que pagaste y hay que entrar por arriba.'); }
+  if (P.prep.has('tunel') && !P.noCollapseRoll && R() < PREP.find((p) => p.id === 'tunel').collapse) { tunnelCollapsed = true; notes.push('El túnel se derrumbó la última noche: perdiste lo que pagaste y hay que entrar por arriba.'); }
   const cfg = {
     cr: P.cr, city: P.city, tier: P.cr.lvl, event: P.event, prep: P.prep, crew: crewOf(P), tools: Object.fromEntries(Object.entries(P.tools).map(([k, n]) => [k, n * TOOLS[k].uses])),
     contract: P.contractOn ? P.contract : null, memory: P.memory, vehicle: P.vehicle, planB: P.planB, mcc, tunnelCollapsed,
+    recon: P.recon || 0, daytime: P.golpeAt != null && hourOfDay(P.golpeAt) >= 8 && hourOfDay(P.golpeAt) < 20,
   };
   const H = generate(cfg);
   H.notes = notes;
@@ -227,7 +230,7 @@ export function toSetup(P, H) {
   }
   return {
     cr, outcome: s.outcome, odds: null, start: start.id, cur: cur.id, hours, heat, traces, notes,
-    t0: P.event === 'partido' ? 21 : 22, soplonUntil: crew.campana ? hours + 12 : -1, disguiseUntil: -1,
+    t0: P.golpeAt != null ? P.golpeAt : P.event === 'partido' ? 21 : 22, soplonUntil: crew.campana ? hours + 12 : -1, disguiseUntil: -1,
     plan: null, summary: s, contract: P.contractOn ? { ...P.contract, ok } : null, fallen,
     crewIds: Object.values(P.crew).filter(Boolean), city: P.city,
   };

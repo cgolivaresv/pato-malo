@@ -7,7 +7,7 @@ Juego de escape en el navegador. Acabas de dar un golpe en una ciudad de Chile y
 ## Cómo se juega
 
 1. Elige un golpe. Hay ocho, de menor a mayor dificultad: lanzazo en el persa, bomba de bencina en la Ruta 5, casa de cambio, camión de valores, joyería, óleo colonial, la bóveda de un casino y lingotes de una bóveda bancaria; los grandes se desbloquean con experiencia.
-2. **Prepara el golpe** en una ciudad chilena al azar, cada una con su sello (ascensores en Valparaíso, metro en Santiago, muelle en los puertos). Hay un imprevisto del día (lluvia, paro de micros, partido de la Roja, temblor…) y a veces un capo te ofrece un encargo con condiciones. Arma tu equipo con personajes que cobran su parte y pueden sapearte, soborna al conserje o a un guardia, compra los planos, trabaja de aseador para entrar desde adentro, cava un túnel, haz una llamada falsa a Carabineros, compra herramientas y deja un vehículo (y un plan B). Cada preparativo despierta la sospecha de McCuack, que puede aparecer de civil.
+2. **Prepara el golpe en el mapa de la ciudad.** Pato llega el lunes a las 09:00 y el golpe es el miércoles a las 23:00. En un mapa simulado (calles, plaza, mar, río o cerros según la ciudad, de día o de noche) camina entre su pieza, el objetivo, el taller (choferes, motos), el cibercafé (hackers), la feria (campanas), la ferretería y el persa (herramientas), la Dirección de Obras (planos), la agencia de aseo (infiltrarte), la alcantarilla (túnel, solo de noche), un teléfono público (llamada falsa) y la casa del capo (encargo). Cada cuadra y cada acción gastan horas; los lugares tienen horario; con 20 horas despierto te duermes donde estés. Vigilar el objetivo destapa piezas del plano. Si despiertas mucha sospecha, McCuack sale a recorrer la ciudad de civil: si te topas con él, va a estar rondando el día del golpe. Puedes dar el golpe antes de la hora: de día hay más botín, pero un guardia más.
 3. **Da el golpe por turnos** en el plano del barrio: camina casilla por casilla, esquiva los conos de visión de guardias y cámaras, fuerza puertas, corta la luz o las cámaras, distrae a los guardias y decide cuánto botín cargar (más peso, más lento). Si suena la alarma, Carabineros sale del retén. Lo que pase ahí (grabado, visto, alarma, por dónde saliste) define cómo empieza la fuga.
 4. Huye. En los golpes chicos basta con llegar a una casa segura fuera de Chile; en los grandes hay que armar un **plan de escape** con un capitán de carguero, un piloto de avioneta o un falsificador maestro, siguiendo rumores que pueden ser falsos.
 5. Muévete por el mapa en bus, avión, paso clandestino o barco, esquivando los controles y la zona de búsqueda de McCuack. Escóndete, disfrázate, consigue plata y sal del continente.
@@ -70,6 +70,7 @@ src/
     heat.js           Calor por país
     plan.js           Plan de escape: rumores, contactos y salidas
     heist.js          Preparación del golpe y paso del plano a la fuga
+    prepmap.js        Mapa de la ciudad para preparar el golpe: lugares, horarios, reloj y McCuack de civil
     board.js          Golpe táctico por turnos: plano, guardias, cámaras, ruido, alarma y patrullas
     career.js         Experiencia, rangos, golpes desbloqueados y habilidades
     pursuit.js        Zona de búsqueda, controles y riesgo de redada
@@ -84,6 +85,7 @@ src/
     digest.js         Parte de novedades después de cada acción
     heistui.js        Escalera de golpes, preparación, resultado del golpe y prontuario
     boardui.js        Pantalla del plano del golpe
+    prepmapui.js      Pantalla del mapa de la ciudad, con Pato caminando entre lugares
     events.js         Manejador único de clics (data-act / data-arg)
   assets/pato/        Ilustración y 8 expresiones del pato (WebP, fondo limpio)
   assets/detective/   Ilustración y 6 expresiones del detective McCuack

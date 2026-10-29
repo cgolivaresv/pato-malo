@@ -103,7 +103,7 @@ export function generate(cfg) {
   for (let i = 0; i < nc; i++) placeCam(H, camRooms[i % camRooms.length]);
   if (tier >= 3) H.cams.push({ x: frontDoor.x + (frontDoor.x > cols / 2 ? -2 : 2), y: rows - 1, dir: [0, -1], street: true });
   // Guardias
-  const ng = Math.min(4, 1 + Math.floor((tier - 1) / 2) + (cfg.event === 'pago' ? 1 : 0) + Math.min(1, cfg.memory));
+  const ng = Math.min(4, 1 + Math.floor((tier - 1) / 2) + (cfg.event === 'pago' ? 1 : 0) + (cfg.daytime ? 1 : 0) + Math.min(1, cfg.memory));
   const gRooms = [front, vault, office, security].filter((r) => r >= 0);
   for (let i = 0; i < ng; i++) placeGuard(H, gRooms[i % gRooms.length], gRooms[(i + 1) % gRooms.length]);
   if (cfg.prep.has('guardia') && H.guards.length) pick(H.guards).bribed = true;
@@ -141,6 +141,11 @@ export function generate(cfg) {
   ];
   if (H.grate) H.start.push({ ...H.grate, n: 'Alcantarilla del túnel' });
   if (H.disguise) { const c = freeCell(H, office >= 0 ? office : front); H.start.push({ ...c, n: 'Adentro, de aseador', inside: true }); }
+  // Lo que viste vigilando: primero el local, después las demás piezas
+  if (cfg.recon && !cfg.prep.has('planos')) {
+    const order = [front, office, security, vault].filter((r) => r >= 0);
+    order.slice(0, cfg.recon).forEach((r) => { H.rooms[r].seen = true; });
+  }
   if (!cfg.vehicle) H.phase = 'entry';
   return H;
 }
@@ -157,7 +162,7 @@ function freeCell(H, roomId) {
 
 function placeLoot(H, cfg) {
   const { cr, tier } = cfg;
-  const boost = cfg.event === 'pago' ? 1.3 : 1;
+  const boost = (cfg.event === 'pago' ? 1.3 : 1) * (cfg.daytime ? 1.25 : 1);
   const ids = H.ids;
   const add = (roomId, tpl, value) => { const c = freeCell(H, roomId); H.items.push({ id: H.items.length, ...c, ...tpl, value: Math.round(value / 1000) * 1000 }); };
   if (cr.kind === 'cash') {
