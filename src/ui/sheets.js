@@ -89,7 +89,7 @@ const FILTERS = [
   ['cerca', 'Cercanos'], ['cl', 'Chile'], ['vecinos', 'Vecinos'], ['sa', 'Sudamérica'], ['mundo', 'Mundo'],
 ];
 
-const MODE_ICON = { air: 'plane', bus: 'bus', paso: 'boot', barco: 'ship' };
+const MODE_ICON = { air: 'plane', bus: 'bus', paso: 'boot', barco: 'ship', tren: 'train' };
 const CNAME = { forger: 'Falsificador', captain: 'Capitán', pilot: 'Piloto' };
 function contactFlag(id) {
   return Object.keys(CONTACTS).filter((k) => S.contacts[k].found && S.contacts[k].city === id).map((k) => `<span class="flag ok">${CNAME[k]}</span>`).join('')
@@ -124,12 +124,13 @@ export function destList() {
 function chosen() {
   if (!S.dest) return '';
   const c = me(), t = CITY[S.dest], { d, out, note } = modes(c.id, t.id);
-  const ICON = { air: I.plane, bus: I.bus, paso: I.boot, barco: I.ship };
+  const ICON = { air: I.plane, bus: I.bus, paso: I.boot, barco: I.ship, tren: I.train };
   const DESC = {
     air: S.id === 'real' || S.idBurnSecret ? 'Pide documento: con el real, la PDI sabrá tu destino en minutos.' : 'Pide documento: viajas con el pasaporte falso.',
     bus: (o) => (t.c !== c.c ? 'Cruza frontera: muestras documento en el control.' : o.id ? 'Viaje dentro del país, pero con control de documentos en la ruta.' : 'Dentro del país no piden documento, pero hay cámaras.') + (o.free ? ' Usas tu pasaje abierto.' : ''),
     paso: 'Evitas migraciones por la cordillera. Lento, caro y con patrullas.',
     barco: 'No piden documento en el muelle, pero la lista de pasajeros queda registrada.',
+    tren: (o) => (t.c !== c.c ? 'Cruza frontera: muestras documento en el control de la estación.' : o.id ? 'Tren dentro del país, pero con control de documentos en el andén.' : 'Dentro del país no piden documento, pero la estación tiene cámaras.'),
   };
   const cards = out.map((o) => decision({
     act: 'travel', arg: `${t.id}|${o.k}`, primary: o.k === 'air', icon: ICON[o.k],

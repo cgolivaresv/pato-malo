@@ -29,7 +29,7 @@ Juego de escape en el navegador. Acabas de dar un golpe en una ciudad de Chile y
 - **Interpol.** Después de un plazo, tu documento real es casi una sentencia.
 - **Recompensas diarias.** Cada 24 horas sin ser atrapado ganas dinero u objetos útiles.
 - **Calor por país.** Cada país tiene su propio calor. La noticia sale donde te descubren y se filtra un poco a los vecinos; al cruzar una frontera llegas con el calor de ese país.
-- **Geografía real.** Invierno o verano: en invierno la nieve cierra los pasos entre Chile y Argentina en el centro y sur. Transbordador de Chacao a Chiloé, barcaza de la Carretera Austral a Coyhaique (08:00), bus a Magallanes por Argentina, barco semanal Puerto Montt–Puerto Natales y controles aduaneros de la Ruta 5 en el Norte Grande.
+- **Geografía y transporte reales.** Chile, Argentina, Perú y Bolivia con sus ciudades más importantes (7, 7, 5 y 3) y, en el resto del mundo, solo las capitales. Solo se vuela entre ciudades con aeropuerto (Valparaíso y Talca no tienen), y los vuelos internacionales salen de aeropuertos que los tienen. Trenes de pasajeros que existen: Santiago–Talca, Arica–Tacna, Buenos Aires–Rosario–Córdoba y Buenos Aires–Rosario–Tucumán, con sus horarios. En invierno la nieve cierra los pasos entre Chile y Argentina en el centro y sur; desde Arica, el bus al sur pasa el control aduanero de Cuya.
 - **Música y sonidos.** Tema de misterio policial generado en el navegador (Web Audio, sin archivos): tic-tac de reloj, bajo que desciende de a medio tono, acordes sostenidos, vibráfono con eco y violonchelo. Se acelera y suma timbales, latido y cuerdas en staccato con el peligro, y suena una sirena lejana cuando la brigada está en tu ciudad. Cada botón, viaje, sello, evento y final tiene su sonido. El botón de nota musical cambia entre música y sonidos, solo sonidos o silencio.
 - **Tutorial.** Pato Malo guía la primera fuga; se puede repetir desde la pantalla de inicio o con el botón «?».
 
@@ -55,8 +55,8 @@ src/
   main.js             Punto de entrada
   styles.css          Estilos y colores
   data/
-    places.js         Países y 70 ciudades con coordenadas
-    geo.js            Agrupaciones: Sudamérica, ciudades grandes, aeropuertos, fronteras
+    places.js         Países y ciudades con coordenadas
+    geo.js            Agrupaciones: Sudamérica, ciudades grandes, aeropuertos, trenes, fronteras
     content.js        Golpes, rangos, habilidades, botín y recompensas
     heistdata.js      Ciudades, equipo, imprevistos, encargos, preparativos y herramientas del golpe
     map.json          Contornos de cada país ya proyectados, con punto para su nombre

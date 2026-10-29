@@ -3,27 +3,14 @@
 // Sello de cada ciudad chilena. exits: salidas a pie que pueden aparecer en el plano.
 // rain: probabilidad extra de lluvia ese día.
 export const CITY_FLAVOR = {
-  arica: { t: 'Ciudad de la eterna primavera, con el Morro mirando todo.', exits: ['muelle'] },
-  iquique: { t: 'Zona franca, calor y la Cavancha llena de gente.', exits: ['muelle'] },
-  sanpedro: { t: 'Pueblo de adobe lleno de turistas; las calles de tierra guardan las huellas.', exits: [] },
-  calama: { t: 'Ciudad minera: plata hay, y guardias también.', exits: [] },
-  antofagasta: { t: 'La costanera larga y el viento del Pacífico.', exits: ['muelle'] },
-  copiapo: { t: 'Plaza con pimientos y mineros de paso.', exits: [] },
-  laserena: { t: 'Iglesias de piedra y la Avenida del Mar.', exits: ['muelle'] },
+  arica: { t: 'Ciudad de la eterna primavera, con el Morro mirando todo y el tren a Tacna.', exits: ['muelle', 'estacion'] },
+  antofagasta: { t: 'La costanera larga, el viento del Pacífico y plata minera en cada banco.', exits: ['muelle'] },
   valparaiso: { t: 'Cerros, escaleras y ascensores: el mejor lugar para perderse.', exits: ['ascensor', 'metro', 'muelle'] },
-  santiago: { t: 'Centro lleno de gente, metro y cámaras en cada esquina.', exits: ['metro'] },
-  rancagua: { t: 'Capital del rodeo: aquí todos se conocen.', exits: [] },
-  talca: { t: 'Calles en damero, uno sur, dos norte: fácil de recorrer y de vigilar.', exits: [] },
-  chillan: { t: 'La feria más grande del sur, con olor a longaniza.', exits: [] },
-  concepcion: { t: 'Ciudad universitaria, el Biotrén y el río Biobío.', exits: ['metro', 'muelle'] },
-  temuco: { t: 'La feria Pinto llena desde temprano.', exits: [] },
-  valdivia: { t: 'Lluvia, río y lobos marinos en el mercado.', exits: ['muelle'], rain: 0.3 },
-  puertomontt: { t: 'Angelmó, curantos y el puerto.', exits: ['muelle'], rain: 0.3 },
-  castro: { t: 'Palafitos y la iglesia de madera.', exits: ['muelle'], rain: 0.3 },
-  coyhaique: { t: 'Plaza pentagonal y frío patagón.', exits: [], rain: 0.15 },
-  natales: { t: 'Mochileros, viento y montañas.', exits: ['muelle'], rain: 0.15 },
-  puntaarenas: { t: 'Un viento que bota, y el estrecho al frente.', exits: ['muelle'], rain: 0.15 },
-};
+  santiago: { t: 'Centro lleno de gente, metro y cámaras en cada esquina.', exits: ['metro', 'estacion'] },
+  talca: { t: 'Calles en damero, uno sur, dos norte, y el tren a Santiago que para en la estación.', exits: ['estacion'] },
+  concepcion: { t: 'Ciudad universitaria, el Biotrén y el río Biobío.', exits: ['biotren', 'muelle'] },
+  puertomontt: { t: 'Angelmó, curantos y el puerto, con lluvia casi todos los días.', exits: ['muelle'], rain: 0.3 },
+}
 
 // Salidas a pie
 export const FOOT_EXITS = {
@@ -31,6 +18,8 @@ export const FOOT_EXITS = {
   metro: { n: 'Metro', d: 'Bajas al metro y sales lejos.' },
   ascensor: { n: 'Ascensor', d: 'Subes al cerro en el ascensor y desapareces entre las escaleras.' },
   muelle: { n: 'Muelle', d: 'Un bote te cruza al otro lado de la bahía.' },
+  estacion: { n: 'Estación de trenes', d: 'Te subes al primer tren y te pierdes entre los pasajeros.' },
+  biotren: { n: 'Biotrén', d: 'Te subes al Biotrén y te bajas lejos del centro.' },
 };
 
 // Equipo. role: chofer · hacker · campana. cut: parte del botín · sapo: probabilidad de caer y hablar.

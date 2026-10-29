@@ -6,11 +6,11 @@ import { PATO } from './pato.js';
 import { detFace } from './detective.js';
 
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-const VERB = { air: 'Volando a', bus: 'En bus a', paso: 'Cruzando la cordillera hacia' };
+const VERB = { air: 'Volando a', bus: 'En bus a', paso: 'Cruzando la cordillera hacia', tren: 'En tren a' };
 let busy = false;
 
 export function playTravel(toId, mode) {
-  sfx(mode === 'air' ? 'air' : mode === 'paso' ? 'paso' : mode === 'barco' ? 'ship' : 'bus');
+  sfx(mode === 'air' ? 'air' : mode === 'paso' ? 'paso' : mode === 'barco' ? 'ship' : mode === 'tren' ? 'train' : 'bus');
   if (busy || reduced()) return Promise.resolve();
   busy = true;
   const fx = $('#fx');

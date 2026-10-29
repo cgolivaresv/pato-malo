@@ -12,12 +12,12 @@ import { sndButton } from './events.js';
 
 const ROUTES = [
   ['talca', 'santiago', 'mendoza', 'cordoba', 'asuncion', 'brasilia'],
-  ['antofagasta', 'calama', 'uyuni', 'lapaz', 'cusco', 'lima'],
-  ['puertomontt', 'bariloche', 'neuquen', 'buenosaires', 'montevideo'],
-  ['concepcion', 'temuco', 'valdivia', 'puertomontt', 'castro', 'coyhaique', 'natales', 'puntaarenas'],
+  ['antofagasta', 'salta', 'lapaz', 'cusco', 'lima'],
+  ['puertomontt', 'bariloche', 'buenosaires', 'montevideo'],
+  ['concepcion', 'talca', 'santiago', 'valparaiso', 'arica', 'tacna'],
   ['arica', 'tacna', 'arequipa', 'lima', 'quito', 'bogota'],
-  ['valparaiso', 'santiago', 'laserena', 'copiapo', 'salta', 'santacruz'],
-];
+  ['valparaiso', 'santiago', 'mendoza', 'tucuman', 'santacruz'],
+]
 const SPEED = 75; // unidades de mapa por segundo
 const CHASE = 2.2; // segundos de ventaja del pato sobre McCuack
 

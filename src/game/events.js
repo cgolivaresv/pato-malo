@@ -54,7 +54,7 @@ export const EVENTS = [
   },
   {
     id: 'pasajero', w: 3, mood: 'normal', title: 'Un pasajero curioso',
-    when: (c) => c.kind === 'travel' && (c.mode === 'bus' || c.mode === 'air'),
+    when: (c) => c.kind === 'travel' && (c.mode === 'bus' || c.mode === 'air' || c.mode === 'tren'),
     text: () => 'Tu compañero de asiento no para de mirarte. Al final pregunta: «¿No te he visto en la tele?»',
     choices: () => [
       { label: 'Hacerte el dormido', desc: 'Lentes, gorra y ronquidos.', chips: { riskText: 'Rastro 40%', riskLvl: 2 },

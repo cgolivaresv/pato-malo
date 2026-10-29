@@ -164,13 +164,13 @@ export const CONTACTS = {
   },
   captain: {
     n: 'Capitán de carguero', short: 'el capitán', icon: 'ship',
-    cities: ['valparaiso', 'antofagasta', 'buenosaires', 'montevideo', 'lima', 'arica', 'iquique', 'concepcion', 'puertomontt'],
+    cities: ['valparaiso', 'antofagasta', 'buenosaires', 'montevideo', 'lima', 'arica', 'concepcion', 'puertomontt', 'trujillo'],
     price: 2000000,
     exit: 'Carguero', exitDesc: 'Viajas escondido entre contenedores. No hay migraciones, pero el barco zarpa solo dos días a la semana.',
   },
   pilot: {
     n: 'Piloto de avioneta', short: 'el piloto', icon: 'plane',
-    cities: ['calama', 'sanpedro', 'uyuni', 'salta', 'santacruz', 'coyhaique', 'natales', 'copiapo', 'neuquen', 'cochabamba'],
+    cities: ['salta', 'santacruz', 'cochabamba', 'talca', 'tucuman', 'bariloche', 'cusco'],
     price: 1500000,
     exit: 'Avioneta', exitDesc: 'Despega de una pista de tierra a las 03:00. Rápida y sin controles, pero un control policial en la ciudad lo arruina.',
   },

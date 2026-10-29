@@ -1,6 +1,6 @@
 // Dibuja la pantalla de juego: barra superior, aviso de peligro, franja de la ciudad,
 // barra de acciones y la hoja abierta. Los botones usan data-act / data-arg (ver events.js).
-import { CITY, COUNTRIES, HUB } from '../data/geo.js';
+import { CITY, COUNTRIES, HUB, airport, hasTrain } from '../data/geo.js';
 import { $, esc, money, clock, store } from '../lib/util.js';
 import { S, crime, me, disguised, policeHere } from '../game/state.js';
 import { drawOverlay } from './map.js';
@@ -116,7 +116,9 @@ function renderStrip() {
   for (const k of Object.keys(CONTACTS)) if (S.contacts[k].found && S.contacts[k].city === c.id) tags.push(`<span class="tag amber">${I[CONTACTS[k].icon]}${CONTACTS[k].n}</span>`);
   if (checkAt(c.id)) tags.push(`<span class="tag hot">${I.shield}Control de McCuack</span>`);
   if (inZone(c)) tags.push(`<span class="tag hot">${I.target}Zona de búsqueda</span>`);
-  if (HUB.has(c.id)) tags.push(`<span class="tag">${I.plane}Vuelos internacionales</span>`);
+  const ap = airport(c);
+  tags.push(ap === 'hub' ? `<span class="tag">${I.plane}Vuelos a todo el mundo</span>` : ap === 'intl' ? `<span class="tag">${I.plane}Vuelos a Sudamérica</span>` : ap ? `<span class="tag">${I.plane}Vuelos nacionales</span>` : `<span class="tag">${I.plane}Sin aeropuerto</span>`);
+  if (hasTrain(c.id)) tags.push(`<span class="tag">${I.train}Estación de trenes</span>`);
   if (disguised()) tags.push(`<span class="tag">${I.mask}Disfrazado</span>`);
   if (S.season === 'invierno' && ['CL', 'AR'].includes(c.c)) tags.push(`<span class="tag cold">${I.snow}Invierno</span>`);
   $('#strip').innerHTML = `<div class="city"><div class="c-eyebrow">${esc(cr.n)} · ${esc(COUNTRIES[c.c].n)}</div><h2>${esc(c.n)}</h2><div class="tags">${tags.join('')}</div></div>

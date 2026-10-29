@@ -77,6 +77,7 @@ export function travel(toId, k) {
     caught(k === 'paso'
       ? `Una patrulla fronteriza te sorprendió cruzando hacia ${COUNTRIES[to.c].n}.`
       : k === 'air' ? `En el control de embarque de ${from.n} tu documento disparó una alerta. Te esposaron ahí mismo.`
+        : k === 'tren' ? `En el andén de ${from.c !== to.c ? 'la frontera' : from.n} la PDI revisó documentos y el tuyo disparó una alerta.`
         : from.c !== to.c ? `En la frontera camino a ${to.n} tu documento disparó una alerta. Te bajaron del bus esposado.`
           : `En un control de la PDI en el bus a ${to.n} te pidieron el documento. Se acabó la fuga.`);
     return;
@@ -89,13 +90,16 @@ export function travel(toId, k) {
   } else if (k === 'bus') {
     if (mo.id && realId) addTrace(toId, 4, mo.trace || `El control fronterizo registra tu paso en bus rumbo a ${to.n}.`);
     else if (R() < 0.28) addTrace(toId, 9 + R() * 6, `Cámaras del terminal de ${to.n} te captan bajando de un bus.`);
+  } else if (k === 'tren') {
+    if (mo.id && realId) addTrace(toId, 3, mo.trace || `El control de la estación registra tu paso en tren rumbo a ${to.n}.`);
+    else if (R() < 0.2) addTrace(toId, 9 + R() * 6, `Cámaras de la estación de ${to.n} te captan bajando del tren.`);
   } else if (k === 'barco') {
     if (realId && R() < 0.3) addTrace(toId, 12, `La lista de pasajeros del barco a ${to.n} incluye tu nombre real.`);
   } else if (k === 'paso') {
     if (R() < 0.12) addTrace(toId, 20, `Pobladores cerca de ${to.n} reportan a un forastero que cruzó por un paso no habilitado.`);
   }
   news(S.hours, `${mo.n}: ${from.n} → ${to.n} (${money(mo.m)}).`, 'me');
-  const sleeps = (k === 'bus' || k === 'barco') && mo.h >= 6;
+  const sleeps = (k === 'bus' || k === 'barco' || k === 'tren') && mo.h >= 6;
   advance(mo.h, { where: 'transit', rest: sleeps });
   if (S.over) return;
   S.awake = sleeps ? 0 : S.awake + mo.h;

@@ -12,7 +12,7 @@ const U = 10; // unidades SVG por casilla
 let st = null; // { P, H, onEnd, walk }
 
 const ICON = { fajo: '💵', bolsa: '💰', sobre: '✉️', bandeja: '💍', lingote: '🟨', oleo: '🖼️', caja: '🗃️', reloj: '⌚' };
-const EXIT_ICON = { paradero: '🚏', metro: 'Ⓜ️', ascensor: '🚡', muelle: '⚓' };
+const EXIT_ICON = { paradero: '🚏', metro: 'Ⓜ️', ascensor: '🚡', muelle: '⚓', estacion: '🚆', biotren: '🚈' };
 
 export function openBoard(P, H, onEnd) {
   let el = document.getElementById('heist');

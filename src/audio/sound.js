@@ -233,6 +233,12 @@ const SFX = {
     tone(sfxBus, { type: 'square', f: 392, t: t + 0.05, dec: 0.12, vol: 0.06, lp: 1500 });
     tone(sfxBus, { type: 'square', f: 330, t: t + 0.2, dec: 0.16, vol: 0.06, lp: 1500 });
   },
+  train: (t) => {
+    // Traqueteo y pito del tren
+    for (let i = 0; i < 6; i++) noise(sfxBus, { t: t + i * 0.16, type: 'bandpass', f: i % 2 ? 900 : 600, q: 1.5, dec: 0.07, vol: 0.2 });
+    tone(sfxBus, { type: 'triangle', f: midi(81), t: t + 0.1, a: 0.04, dec: 0.5, vol: 0.09 });
+    tone(sfxBus, { type: 'triangle', f: midi(84), t: t + 0.1, a: 0.04, dec: 0.5, vol: 0.07 });
+  },
   air: (t) => { noise(sfxBus, { t, type: 'bandpass', f: 300, f2: 2500, q: 0.7, a: 0.4, dec: 0.7, vol: 0.22 }); tone(sfxBus, { type: 'sawtooth', f: 90, f2: 240, t, a: 0.3, dec: 0.8, vol: 0.06, lp: 600 }); },
   paso: (t) => { for (let i = 0; i < 6; i++) noise(sfxBus, { t: t + i * 0.16, type: 'lowpass', f: 900, dec: 0.06, vol: 0.25 }); },
   ship: (t) => { tone(sfxBus, { type: 'sawtooth', f: 98, t, a: 0.08, dec: 0.9, vol: 0.14, lp: 500 }); tone(sfxBus, { type: 'sawtooth', f: 147, t, a: 0.08, dec: 0.9, vol: 0.1, lp: 500 }); },

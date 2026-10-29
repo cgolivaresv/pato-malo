@@ -25,6 +25,7 @@ export const I = {
   ext: svg('<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'),
   pin: svg('<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>'),
   warn: svg('<path d="M12 4l9.5 16h-19L12 4z"/><path d="M12 10v4.5M12 17.5v.01"/>'),
+  train: svg('<rect x="6" y="3" width="12" height="14" rx="3"/><path d="M6 10h12M9 20l-2 2M15 20l2 2M9 17l-1.5 3h9L15 17"/><circle cx="9" cy="13.5" r=".6"/><circle cx="15" cy="13.5" r=".6"/>'),
   ship: svg('<path d="M3 15l2.5 5h13L21 15H3z"/><path d="M6 15V9h12v6M9 9V5h6v4M12 5V3"/>'),
   snow: svg('<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5L12 7l2.5-2.5M9.5 19.5L12 17l2.5 2.5"/>'),
   sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>'),
