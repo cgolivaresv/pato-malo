@@ -1,5 +1,5 @@
 // Riesgos de los controles y opciones de transporte, con la geografía real del cono sur.
-import { CITY, HUB, BORDER, TRAINS, inSA, airport, intlAirport } from '../data/geo.js';
+import { CITY, HUB, BORDER, TRAINS, inSA, airport, intlAirport, busHours } from '../data/geo.js';
 import { clamp01, dist } from '../lib/util.js';
 import { S, disguised, interpol } from './state.js';
 import { checkAt, inZone, zoneDensity } from './pursuit.js';
@@ -127,7 +127,7 @@ export function modes(fromId, toId) {
   // Bus
   if (!world && d <= 3000) {
     const road = d * 1.3;
-    const bus = { k: 'bus', n: 'Bus', h: road / 66 + 0.5 + (intl ? 2 : 0), m: S.perks.bus ? 0 : road * 28, p: idRisk('bus', from, to), id: intl, free: !!S.perks.bus, info: [] };
+    const bus = { k: 'bus', n: 'Bus', h: busHours(from, to, d), m: S.perks.bus ? 0 : road * 28, p: idRisk('bus', from, to), id: intl, free: !!S.perks.bus, info: [] };
     if (snowClosed(from, to)) bus.closed = 'Paso cordillerano cerrado por nieve';
     if (checkAt(fromId) || checkAt(toId)) {
       bus.id = true;

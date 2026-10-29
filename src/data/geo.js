@@ -42,3 +42,27 @@ export const BORDER = {
   BO: ['CL', 'AR', 'PE', 'BR', 'PY'], BR: ['AR', 'BO', 'PE', 'UY', 'PY', 'CO', 'VE'], UY: ['AR', 'BR'],
   PY: ['AR', 'BO', 'BR'], CO: ['PE', 'BR', 'EC', 'VE'], EC: ['PE', 'CO'], VE: ['CO', 'BR'],
 };
+
+// Horas reales aproximadas de bus en las rutas habituales (incluye el control de frontera).
+// Los tramos que no están aquí se calculan con la distancia por carretera.
+const BUS = {
+  'santiago|valparaiso': 1.75, 'santiago|talca': 3.5, 'santiago|concepcion': 6.5, 'santiago|puertomontt': 12.5,
+  'santiago|antofagasta': 19, 'santiago|arica': 28, 'valparaiso|talca': 5, 'valparaiso|concepcion': 8,
+  'valparaiso|puertomontt': 14, 'valparaiso|antofagasta': 19, 'valparaiso|arica': 28, 'talca|concepcion': 4,
+  'talca|puertomontt': 9.5, 'concepcion|puertomontt': 9, 'antofagasta|arica': 10, 'antofagasta|talca': 22,
+  'antofagasta|concepcion': 25, 'arica|talca': 31, 'arica|concepcion': 34,
+  'santiago|mendoza': 7, 'santiago|buenosaires': 20, 'santiago|cordoba': 16, 'valparaiso|mendoza': 8,
+  'arica|tacna': 1.5, 'arica|lapaz': 9, 'antofagasta|salta': 14, 'puertomontt|bariloche': 7,
+  'tacna|arequipa': 6, 'tacna|lima': 18, 'arequipa|lima': 16, 'arequipa|cusco': 10, 'cusco|lima': 21,
+  'lima|trujillo': 9, 'cusco|lapaz': 12, 'arequipa|lapaz': 12, 'tacna|lapaz': 10,
+  'lapaz|cochabamba': 7, 'cochabamba|santacruz': 10, 'lapaz|santacruz': 17,
+  'salta|tucuman': 4.5, 'tucuman|cordoba': 8.5, 'cordoba|rosario': 6, 'cordoba|buenosaires': 10,
+  'rosario|buenosaires': 4, 'mendoza|cordoba': 10, 'mendoza|buenosaires': 14, 'mendoza|rosario': 12,
+  'bariloche|buenosaires': 21, 'bariloche|mendoza': 18, 'salta|buenosaires': 20, 'tucuman|buenosaires': 15,
+  'salta|cordoba': 12, 'salta|santacruz': 15, 'buenosaires|montevideo': 8, 'buenosaires|asuncion': 18,
+};
+export function busHours(a, b, km) {
+  const h = BUS[`${a.id}|${b.id}`] ?? BUS[`${b.id}|${a.id}`];
+  if (h != null) return h;
+  return (km * 1.3) / 68 + 0.3 + (a.c !== b.c ? 1.5 : 0);
+}
